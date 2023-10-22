@@ -1,0 +1,324 @@
+{
+	"info": {
+		"_postman_id": "0d4ce8b2-36ba-46a5-970a-0a3b45c4e549",
+		"name": "CVRank",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "20498029",
+		"_collection_link": "https://dark-escape-873868.postman.co/workspace/My-Workspace~fd59678e-5c9a-4e36-8407-3c2ba6dcae38/collection/20498029-0d4ce8b2-36ba-46a5-970a-0a3b45c4e549?action=share&source=collection_link&creator=20498029"
+	},
+	"item": [
+		{
+			"name": "Job",
+			"item": [
+				{
+					"name": "Filter by Page",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"page_size\": 10,\r\n    \"page\": 1\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{HOST}}/job-page",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"job-page"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add new",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"job_name\": \"ML Engineer\",\r\n    \"job_description\": \"Data Engineer job_description?\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{HOST}}/job",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"job"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{HOST}}/job",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"job"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"job_name\": \"AI Engineer\",\r\n    \"job_description\": \"AI Engineer job_description update?\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{HOST}}/job/1",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"job",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}/job/1",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"job",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Candidate",
+			"item": [
+				{
+					"name": "UploadCV",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file_upload",
+									"type": "file",
+									"src": "/C:/Users/DELL/Desktop/chatbotCV/CVs/resume(1).pdf"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{HOST}}/upload-cv",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"upload-cv"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Filter by Page",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"page_size\": 10,\r\n    \"page\": 1\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{HOST}}/list-candidate",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"list-candidate"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}/candidate/2",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"candidate",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get by id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}/candidate/1",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"candidate",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Matching",
+			"item": [
+				{
+					"name": "Get Matching",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{HOST}}/data-matching/1/1",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"data-matching",
+								"1",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Filter by Page",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"job_name\": \"ML Engineer\",\r\n    \"page_size\": 10,\r\n    \"page\": 1\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{HOST}}/data-matching",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"data-matching"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Process Matching",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"job_name\": \"ML Engineer\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{HOST}}/process-matching",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"process-matching"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
