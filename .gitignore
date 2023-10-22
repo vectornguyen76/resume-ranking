@@ -1,2 +1,2 @@
-certificates/ssl
-server/log
+certificates
+nginx-server/log
