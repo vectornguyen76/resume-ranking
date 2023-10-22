@@ -34,8 +34,6 @@ services:
     image: postgres:13.3
     env_file:
       - ./backend/.env.db.local
-    # ports:
-    #   - 5431:5432
     volumes:
       - postgresql_data:/var/lib/postgresql/data/
 
@@ -43,8 +41,8 @@ services:
     container_name: nginx_container
     image: nginx:1.25.1-alpine
     volumes:
-      - ./server/default.conf:/etc/nginx/conf.d/default.conf
-      - ./server/log:/var/log/nginx/
+      - ./nginx-server/default.conf:/etc/nginx/conf.d/default.conf
+      - ./nginx-server/log:/var/log/nginx/
       - ./certificates/cache:/etc/nginx/cache
       - ./certificates/ssl:/etc/nginx/ssl
       - ./certificates/ssl/bot:/etc/nginx/ssl/bot
