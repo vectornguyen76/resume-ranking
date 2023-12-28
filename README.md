@@ -34,6 +34,12 @@ The Resume Ranking System is a powerful tool designed to streamline the recruitm
   on each key field.
   + Average runtime: 30 seconds
 
+- **Score, Rank & Comment**:
+  + Provides a summary analysis of the
+  matching between candidates and
+  jobs
+  + Score and rank candidate.
+
 ## Documentation
 
 Detailed documentation on how to use, configure, and extend the system is available in the [User Guide](https://drive.google.com/file/d/1PWt5uJq1rc59S7lkV6PjxDPamHyDmKRZ/view?usp=sharing).
