@@ -3,11 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "env-cmd -f .env.prod next dev",
-    "build": "env-cmd -f .env.prod next build",
-    "build:dev": "env-cmd -f .env.dev next build",
-    "start": "env-cmd -f .env.prod next start",
-    "start:dev": "env-cmd -f .env.dev next start",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {

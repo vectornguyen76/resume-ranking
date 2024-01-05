@@ -7,8 +7,8 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     command: npm start
-    # ports:
-    #   - 3000:3000
+    ports:
+      - 3000:3000
 
   backend_service:
     container_name: backend
@@ -40,17 +40,14 @@ services:
   nginx_service:
     container_name: nginx_container
     image: nginx:1.25.1-alpine
-    volumes:
-      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
-      - ./nginx/log:/var/log/nginx/
-      - ./nginx/certificates/cache:/etc/nginx/cache
-      - ./nginx/certificates/ssl:/etc/nginx/ssl
-      - ./nginx/certificates/ssl/bot:/etc/nginx/ssl/bot
     ports:
       - 80:80
-      - 443:443
+    volumes:
+      - ./nginx/develop.conf:/etc/nginx/conf.d/default.conf
+      - ./nginx/log:/var/log/nginx/
     depends_on:
       - backend_service
+      - frontend_service
 
 volumes:
   postgresql_data:
