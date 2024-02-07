@@ -14,31 +14,34 @@ The Resume Ranking System is a powerful tool designed to streamline the recruitm
 
 ## Features
 
-- **Job Analysis**: 
-  + Manage JDs
-  + Analyze JDs to standard forma
-  + Multilingual Support.
-  + Average runtime: 30 seconds
+- **Job Analysis**:
 
-- **Candidate Analysis**: 
-  + Upload and manage CVs (PDF/ Word)
-  + Extract Personal information.
-  + Analyze CVs to standard format.
-  + Multilingual Support.
-  + Average runtime: 60 seconds
+  - Manage JDs
+  - Analyze JDs to standard forma
+  - Multilingual Support.
+  - Average runtime: 30 seconds
 
-- **Matching Analysis**: 
-  + Manage candidates & jobs with a
-  many-to-many relationship
-  + Analyze and score candidate based
-  on each key field.
-  + Average runtime: 30 seconds
+- **Candidate Analysis**:
+
+  - Upload and manage CVs (PDF/ Word)
+  - Extract Personal information.
+  - Analyze CVs to standard format.
+  - Multilingual Support.
+  - Average runtime: 60 seconds
+
+- **Matching Analysis**:
+
+  - Manage candidates & jobs with a
+    many-to-many relationship
+  - Analyze and score candidate based
+    on each key field.
+  - Average runtime: 30 seconds
 
 - **Score, Rank & Comment**:
-  + Provides a summary analysis of the
-  matching between candidates and
-  jobs
-  + Score and rank candidate.
+  - Provides a summary analysis of the
+    matching between candidates and
+    jobs
+  - Score and rank candidate.
 
 ## Documentation
 
@@ -52,18 +55,33 @@ For a visual walkthrough of the system's functionality, check out our [Video Dem
 
 Follow these steps to get the Resume Ranking System up and running:
 
-1. **Clone the Repository**: 
+1. **Clone the Repository**:
+
    ```bash
    git clone https://github.com/your-username/resume-ranking.git
    ```
 
-2. **Install Dependencies**:
+2. **Update environment**:
+
+   - Update **OPENAI_API_KEY** in `backend/.env.api.local`
+      ```bash
+      OPENAI_API_KEY="your-key"
+      ```
+
+   - Update **IP Address** in `frontend/.env.production`
+      ```bash
+      NEXT_PUBLIC_API_URL=http://<your-ip-address>/backend
+      ```
+
+3. **Install Dependencies**:
+
    ```bash
    cd resume-ranking
    docker compose build
    ```
 
-3. **Run the System**:
+4. **Run the System**:
+
    ```bash
    docker compose up
    ```

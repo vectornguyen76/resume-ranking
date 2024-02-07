@@ -2,7 +2,7 @@ version: '3'
 services:
   frontend_service:
     container_name: frontend_container
-    image: frontend_image
+    image: vectornguyen76/resume_ranking_frontend
     build:
       context: ./frontend
       dockerfile: Dockerfile
@@ -12,7 +12,7 @@ services:
 
   backend_service:
     container_name: backend
-    image: backend_image
+    image: vectornguyen76/resume_ranking_backend
     build:
       context: ./backend
       dockerfile: Dockerfile

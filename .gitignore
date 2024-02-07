@@ -1,2 +1,4 @@
 certificates
 nginx/log
+*.log
+*.mp4
