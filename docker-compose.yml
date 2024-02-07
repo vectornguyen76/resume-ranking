@@ -22,7 +22,7 @@ services:
       - 5000:5000
     restart: on-failure
     volumes:
-      - ./backend/logs/api.log:/app/logs/api.log
+      - ./backend/logs:/app/logs
       - ./backend/matching_analysis:/app/matching_analysis
       - ./backend/job_analysis:/app/job_analysis
       - ./backend/cv_analysis:/app/cv_analysis
