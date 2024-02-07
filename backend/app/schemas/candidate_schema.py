@@ -1,16 +1,21 @@
-from marshmallow import Schema, fields, validates_schema, ValidationError
+from marshmallow import Schema, ValidationError, fields, validates_schema
+
 
 class UploadFileSchema(Schema):
     file_upload = fields.Field(required=True)
+
     @validates_schema
     def validate_pdf_or_doc_file(self, data, **kwargs):
-        file_upload = data['file_upload']
-        if not (file_upload.filename.endswith('.pdf') or
-                file_upload.filename.endswith('.docx') or
-                file_upload.filename.endswith('.PDF') or
-                file_upload.filename.endswith('.DOCX')):
-            raise ValidationError('File must be a PDF or DOCX')
-        
+        file_upload = data["file_upload"]
+        if not (
+            file_upload.filename.endswith(".pdf")
+            or file_upload.filename.endswith(".docx")
+            or file_upload.filename.endswith(".PDF")
+            or file_upload.filename.endswith(".DOCX")
+        ):
+            raise ValidationError("File must be a PDF or DOCX")
+
+
 class PlainCandidateSchema(Schema):
     id = fields.Int(dump_only=True)
     candidate_name = fields.Str()
@@ -23,7 +28,8 @@ class PlainCandidateSchema(Schema):
     cv_type = fields.Str()
     cv_size = fields.Int()
     cv_date = fields.Str(dump_only=True)
-    
+
+
 class CandidateDetailSchema(Schema):
     id = fields.Int(dump_only=True)
     candidate_name = fields.Str()
@@ -42,11 +48,13 @@ class CandidateDetailSchema(Schema):
     soft_skills = fields.List(fields.Str())
     technical_skills = fields.List(fields.Str())
     cv_date = fields.Str(dump_only=True)
-    
+
+
 class CandidateSchema(Schema):
     results = fields.List(fields.Nested(PlainCandidateSchema()))
     total_page = fields.Int()
     total_file = fields.Int()
+
 
 class CandidateFilterSchema(Schema):
     page_size = fields.Int(allow_none=True, required=True)

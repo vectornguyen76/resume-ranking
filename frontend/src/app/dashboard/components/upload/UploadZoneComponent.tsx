@@ -5,7 +5,7 @@ import Image from "next/image";
 import { Button, Typography } from "@mui/material";
 import { useUploadFileData } from "@/app/hooks/react-query/management/file/useFilesUploadData";
 import { ToastContainer, toast } from "react-toastify";
-import { MdOutlineCloudUpload, MdClear } from 'react-icons/md';
+import { MdOutlineCloudUpload, MdClear } from "react-icons/md";
 
 type Props = {
   refetch: () => void;
@@ -64,18 +64,18 @@ const UploadZoneComponent = (props: Props) => {
     const selectedFiles = event.target.files;
     const newFile = [...file];
 
-      if (selectedFiles) {
-        for (let i = 0; i < selectedFiles.length; i++) {
-          newFile.push(selectedFiles[i]);
-        }
-
-        setFile(newFile);
+    if (selectedFiles) {
+      for (let i = 0; i < selectedFiles.length; i++) {
+        newFile.push(selectedFiles[i]);
       }
-    };
+
+      setFile(newFile);
+    }
+  };
 
   const clearFile = () => {
     setFile([]);
-  }
+  };
 
   return (
     <>
@@ -140,21 +140,24 @@ const UploadZoneComponent = (props: Props) => {
                     />
 
                     <div className="flex flex-row items-center justify-center py-10 text-center z-10">
-                      {file.length !== 0 ? ( file.map((file) =>(
-                        <>
-                        <div className="flex flex-col ml-2 mr-2 justify-center items-center border w-2/12">
-                          <Image
-                            src="/media/svg/file-icon.svg"
-                            alt="File Upload"
-                            width={50}
-                            height={30}
-                          />
-                          <div className="text-sm dark:text-white w-1/2">
-                            <Typography noWrap gutterBottom>{file.name}</Typography>
-                          </div>
-                        </div>
-                      </>
-                      ))
+                      {file.length !== 0 ? (
+                        file.map((file) => (
+                          <>
+                            <div className="flex flex-col ml-2 mr-2 justify-center items-center border w-2/12">
+                              <Image
+                                src="/media/svg/file-icon.svg"
+                                alt="File Upload"
+                                width={50}
+                                height={30}
+                              />
+                              <div className="text-sm dark:text-white w-1/2">
+                                <Typography noWrap gutterBottom>
+                                  {file.name}
+                                </Typography>
+                              </div>
+                            </div>
+                          </>
+                        ))
                       ) : (
                         <div className="flex text-center">
                           <FaRegFilePdf className="dark:text-white w-6 h-6 mr-2" />
@@ -171,20 +174,25 @@ const UploadZoneComponent = (props: Props) => {
                   </div>
                 </>
               )}
-              {(file && !isUpload) && (
+              {file && !isUpload && (
                 <div className="pt-4 flex justify-center items-start text-center">
-                <button
-                  className="p-2 flex text-xs font-medium text-center text-white bg-green-500 rounded-lg hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 dark:bg-green-600 dark:hover-bg-green-700 dark:focus:ring-green-800"
-                  type="submit"
-                >
-                  <MdOutlineCloudUpload style={{ fontSize: '18px' }}  className="mr-2" /> Upload
-                </button>
+                  <button
+                    className="p-2 flex text-xs font-medium text-center text-white bg-green-500 rounded-lg hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 dark:bg-green-600 dark:hover-bg-green-700 dark:focus:ring-green-800"
+                    type="submit"
+                  >
+                    <MdOutlineCloudUpload
+                      style={{ fontSize: "18px" }}
+                      className="mr-2"
+                    />{" "}
+                    Upload
+                  </button>
                   <button
                     className="p-2 flex text-xs font-medium text-center text-white bg-red-500 rounded-lg hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800 ml-4"
                     type="button"
                     onClick={clearFile}
                   >
-                    <MdClear style={{ fontSize: '18px' }}  className="mr-2" /> Clear
+                    <MdClear style={{ fontSize: "18px" }} className="mr-2" />{" "}
+                    Clear
                   </button>
                 </div>
               )}

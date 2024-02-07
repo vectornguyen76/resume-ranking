@@ -1,12 +1,15 @@
 from marshmallow import Schema, fields
 
+
 class MatchingSchema(Schema):
     job_name = fields.Str(required=True)
+
 
 class MatchingFilterPageSchema(Schema):
     job_name = fields.Str(required=True)
     page_size = fields.Int(allow_none=True, required=True)
     page = fields.Int(allow_none=True, required=True)
+
 
 class PlainMatchingSchema(Schema):
     id = fields.Int(dump_only=True)
@@ -18,11 +21,13 @@ class PlainMatchingSchema(Schema):
     comment = fields.Str(required=True)
     matching_status = fields.Bool(required=True)
 
+
 class MatchingPageSchema(Schema):
     results = fields.List(fields.Nested(PlainMatchingSchema()))
     total_page = fields.Int()
     total_matching = fields.Int()
-    
+
+
 class MatchingDetailSchema(Schema):
     id = fields.Int(dump_only=True)
     candidate_name = fields.Str(required=True)

@@ -1,7 +1,8 @@
 from app.db import db
 
+
 class JobModel(db.Model):
-    __tablename__ = 'job'
+    __tablename__ = "job"
 
     id = db.Column(db.Integer, primary_key=True)
     job_name = db.Column(db.String(), unique=True, nullable=False)

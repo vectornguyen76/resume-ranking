@@ -2,7 +2,11 @@
 import React, { useEffect } from "react";
 import { createColumnHelper, Row } from "@tanstack/react-table";
 import UseTableTanStackSSR from "@/app/hooks/react-table/useTableTanStackSSR";
-import { useDeleteFileData, useListCandidateData, useListFileDetailData } from "@/app/hooks/react-query/management/file/useFilesUploadData";
+import {
+  useDeleteFileData,
+  useListCandidateData,
+  useListFileDetailData,
+} from "@/app/hooks/react-query/management/file/useFilesUploadData";
 import { TablePagination, Drawer } from "@mui/material";
 import { Dialog, Transition } from "@headlessui/react";
 import { ToastContainer, toast } from "react-toastify";
@@ -19,13 +23,15 @@ const TableCandidates = (props2: Props) => {
   const [fetching, setIsFetching] = React.useState<boolean>(false);
   const [fileId, setFileId] = React.useState<number>(0);
   const [fileName, setFileName] = React.useState<string>("");
-  const [isOpenModalDelete, setIsOpenModalDelete] = React.useState<boolean>(false);
+  const [isOpenModalDelete, setIsOpenModalDelete] =
+    React.useState<boolean>(false);
   const fileDetailQuery = useListFileDetailData(fileId);
   const { mutate: deleteFile } = useDeleteFileData(fileId);
 
   // Fetch file data using the useListFileData hook
   // const { data, isLoading, isError, refetch } = useListCandidateData((currentPage + 1), pageSize);
-  const { data, isLoading, isError, isPreviousData, refetch } = useListCandidateData((currentPage + 1), pageSize);
+  const { data, isLoading, isError, isPreviousData, refetch } =
+    useListCandidateData(currentPage + 1, pageSize);
 
   // Create a function to periodically refetch data
   const startAutoRefresh = () => {
@@ -53,10 +59,9 @@ const TableCandidates = (props2: Props) => {
     };
   }, []); // The empty dependency array ensures this effect runs only once when the component mounts
 
-
   const showModalDelete = (fileId: number, fileName: string) => {
-    setFileId(fileId)
-    setFileName(fileName)
+    setFileId(fileId);
+    setFileName(fileName);
     setIsOpenModalDelete(true);
   };
 
@@ -70,17 +75,17 @@ const TableCandidates = (props2: Props) => {
       {
         onError: (error: any) => {
           console.log("Delete file error:", error.response.status);
-          setIsOpenModalDelete(false)
+          setIsOpenModalDelete(false);
           toast.error("Delete file failed");
         },
         onSuccess: async () => {
-          setIsOpenModalDelete(false)
+          setIsOpenModalDelete(false);
           props2.refetch();
           toast.success("Delete file success");
         },
       }
-    )
-  }
+    );
+  };
 
   const columnHelper = createColumnHelper<CandidateModel>();
   const columns = [
@@ -139,7 +144,9 @@ const TableCandidates = (props2: Props) => {
             <button
               className="p-2 ml-2 text-xs font-medium text-center text-white bg-red-500 rounded-lg hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800"
               value={row.original.id}
-              onClick={() => showModalDelete(row.original.id, row.original.name)}
+              onClick={() =>
+                showModalDelete(row.original.id, row.original.name)
+              }
             >
               Delete
             </button>
@@ -214,35 +221,45 @@ const TableCandidates = (props2: Props) => {
                   Candidate Name
                 </div>
                 <p className="text-sm leading-6 text-gray-60">
-                  {fileDetailQuery.data?.candidate_name ? fileDetailQuery.data?.candidate_name : 'None'}
+                  {fileDetailQuery.data?.candidate_name
+                    ? fileDetailQuery.data?.candidate_name
+                    : "None"}
                 </p>
 
                 <div className="mt-2 text-base font-semibold leading-7 text-gray-900">
                   Candidate Email Address
                 </div>
                 <p className="text-sm leading-6 text-gray-60">
-                  {fileDetailQuery.data?.candidate_email ? fileDetailQuery.data?.candidate_email : 'None'}
+                  {fileDetailQuery.data?.candidate_email
+                    ? fileDetailQuery.data?.candidate_email
+                    : "None"}
                 </p>
 
                 <div className="mt-2 text-base font-semibold leading-7 text-gray-900">
                   Candidate Phone Number
                 </div>
                 <p className="text-sm leading-6 text-gray-60">
-                  {fileDetailQuery.data?.candidate_phone ? fileDetailQuery.data?.candidate_phone : 'None'}
+                  {fileDetailQuery.data?.candidate_phone
+                    ? fileDetailQuery.data?.candidate_phone
+                    : "None"}
                 </p>
 
                 <div className="mt-2 text-base font-semibold leading-7 text-gray-900">
                   Candidate Summary
                 </div>
                 <p className="text-sm leading-6 text-gray-60">
-                  {fileDetailQuery.data?.candidate_summary ? fileDetailQuery.data?.candidate_summary : 'None'}
+                  {fileDetailQuery.data?.candidate_summary
+                    ? fileDetailQuery.data?.candidate_summary
+                    : "None"}
                 </p>
 
                 <div className="text-base font-semibold leading-7 text-gray-900">
                   Recommended Jobs
                 </div>
                 <p className="text-sm leading-6 text-gray-60">
-                  {fileDetailQuery.data?.recommended_jobs ? fileDetailQuery.data?.recommended_jobs : 'None'}
+                  {fileDetailQuery.data?.recommended_jobs
+                    ? fileDetailQuery.data?.recommended_jobs
+                    : "None"}
                 </p>
 
                 <div className="mt-2 text-base font-semibold leading-7 text-gray-900">
@@ -290,11 +307,16 @@ const TableCandidates = (props2: Props) => {
                 <div className="px-2 max-w-[500px]">
                   {(fileDetailQuery.data?.technical_skills || []).length > 0 ? (
                     <div className="flex flex-wrap">
-                      {fileDetailQuery.data?.technical_skills.map((edu, index) => (
-                        <span className="rounded-full bg-blue-500 text-white px-2 py-1 m-1" key={index}>
-                          {edu.replace(/\s/g, '')}
-                        </span>
-                      ))}
+                      {fileDetailQuery.data?.technical_skills.map(
+                        (edu, index) => (
+                          <span
+                            className="rounded-full bg-blue-500 text-white px-2 py-1 m-1"
+                            key={index}
+                          >
+                            {edu.replace(/\s/g, "")}
+                          </span>
+                        )
+                      )}
                     </div>
                   ) : (
                     <div>None</div>
@@ -331,14 +353,18 @@ const TableCandidates = (props2: Props) => {
                   Candidate CV Name
                 </div>
                 <p className="text-sm leading-6 text-gray-60">
-                  {fileDetailQuery.data?.cv_name ? fileDetailQuery.data?.cv_name : 'None'}
+                  {fileDetailQuery.data?.cv_name
+                    ? fileDetailQuery.data?.cv_name
+                    : "None"}
                 </p>
 
                 <div className="mt-2 text-base font-semibold leading-7 text-gray-900">
                   Candidate Created Date
                 </div>
                 <p className="text-sm leading-6 text-gray-60">
-                  {fileDetailQuery.data?.cv_date ? fileDetailQuery.data?.cv_date : 'None'}
+                  {fileDetailQuery.data?.cv_date
+                    ? fileDetailQuery.data?.cv_date
+                    : "None"}
                 </p>
               </div>
             </>

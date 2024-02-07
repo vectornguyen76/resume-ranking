@@ -1,5 +1,5 @@
-from analysis_service.main import DocumentAnalyzer
 from analysis_service.main import *
+from analysis_service.main import DocumentAnalyzer
 
 analyzer = DocumentAnalyzer()
 
@@ -52,11 +52,10 @@ job_file_name = "test job.json"
 # analyzer.analyse_matching(cv_file_name, job_file_name)
 # print(system_prompt_candidate)
 
-# for i in range(15, 40):   
+# for i in range(15, 40):
 #     file_name = "resume("+str(i)+").pdf"
 #     print(file_name)
 #     analyzer.analyse_candidate(file_name)
-
 
 
 # from langchain.chat_models import ChatOpenAI

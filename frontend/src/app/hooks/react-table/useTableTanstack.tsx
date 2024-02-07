@@ -1,5 +1,12 @@
 import React from "react";
-import { flexRender, getCoreRowModel, useReactTable, PaginationState, getPaginationRowModel, OnChangeFn } from "@tanstack/react-table";
+import {
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
+  PaginationState,
+  getPaginationRowModel,
+  OnChangeFn,
+} from "@tanstack/react-table";
 import { Pagination, TablePagination, Stack } from "@mui/material";
 
 type Props = {
@@ -7,12 +14,10 @@ type Props = {
   columns: any[];
 };
 
-const listPageSize = [
-  10, 20, 30, 40
-]
+const listPageSize = [10, 20, 30, 40];
 
 const UseTableTanstack = (props: Props) => {
-  const [pageSize, setPageSize] = React.useState<number>(listPageSize[0])
+  const [pageSize, setPageSize] = React.useState<number>(listPageSize[0]);
 
   const table = useReactTable({
     data: props.data,
@@ -64,8 +69,7 @@ const UseTableTanstack = (props: Props) => {
       </table>
       {/* Pagination */}
       <div className="hidden md:grid md:grid-cols-3 gap-2 mt-12 p-4">
-        <div>
-        </div>
+        <div></div>
         <div className="md:flex md:justify-center text-center">
           <Stack spacing={2} mt={2}>
             <Pagination
@@ -88,14 +92,14 @@ const UseTableTanstack = (props: Props) => {
             onPageChange={(event, newPage) => {
               table.setPageIndex((newPage as number) - 1);
             }}
-            nextIconButtonProps={{ style: { display: 'none' } }}
-            backIconButtonProps={{ style: { display: 'none' } }}
+            nextIconButtonProps={{ style: { display: "none" } }}
+            backIconButtonProps={{ style: { display: "none" } }}
             rowsPerPageOptions={listPageSize}
             rowsPerPage={pageSize}
-            onRowsPerPageChange={event => {
-              const pageSize = Number(event.target.value)
-              setPageSize(pageSize)
-              table.setPageSize(pageSize)
+            onRowsPerPageChange={(event) => {
+              const pageSize = Number(event.target.value);
+              setPageSize(pageSize);
+              table.setPageSize(pageSize);
             }}
             className="bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white"
           />

@@ -64,14 +64,15 @@ Follow these steps to get the Resume Ranking System up and running:
 2. **Update environment**:
 
    - Update **OPENAI_API_KEY** in `backend/.env.api.local`
-      ```bash
-      OPENAI_API_KEY="your-key"
-      ```
+
+     ```bash
+     OPENAI_API_KEY="your-key"
+     ```
 
    - Update **IP Address** in `frontend/.env.production`
-      ```bash
-      NEXT_PUBLIC_API_URL=http://<your-ip-address>/backend
-      ```
+     ```bash
+     NEXT_PUBLIC_API_URL=http://<your-ip-address>/backend
+     ```
 
 3. **Install Dependencies**:
 

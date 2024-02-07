@@ -61,15 +61,16 @@ const ActiveLink = ({
 
 const SidebarDashboard = (props: Props) => {
   const [updatedSubMenuLS, setUpdatedSubMenuLS] = useState<number[]>([]);
-  const [isLocalStorageUpdated, setIsLocalStorageUpdated] = useState<boolean>(false);
+  const [isLocalStorageUpdated, setIsLocalStorageUpdated] =
+    useState<boolean>(false);
   const [showSubMenu, setShowSubMenu] = useState(
     new Array(SidebarDataDashboard.length).fill(false)
   );
 
   const setLocalStorage = (value: number[]) => {
-    localStorage.setItem('updatedSubMenu', JSON.stringify(value));
+    localStorage.setItem("updatedSubMenu", JSON.stringify(value));
     setUpdatedSubMenuLS(value);
-  }
+  };
 
   const handleParentClick = async (index: number) => {
     const updatedSubMenu = [...showSubMenu];
@@ -79,15 +80,19 @@ const SidebarDashboard = (props: Props) => {
     if (updatedSubMenu[index]) {
       setLocalStorage([...updatedSubMenuLS, index]);
     } else {
-      setLocalStorage(updatedSubMenuLS.filter(i => i !== index));
+      setLocalStorage(updatedSubMenuLS.filter((i) => i !== index));
     }
   };
 
   useEffect(() => {
-    const updatedSubMenuLS = JSON.parse(localStorage.getItem('updatedSubMenu') || '[]');
+    const updatedSubMenuLS = JSON.parse(
+      localStorage.getItem("updatedSubMenu") || "[]"
+    );
     if (updatedSubMenuLS.length > 0) {
       setShowSubMenu(
-        new Array(SidebarDataDashboard.length).fill(false).map((_, index) => updatedSubMenuLS.includes(index))
+        new Array(SidebarDataDashboard.length)
+          .fill(false)
+          .map((_, index) => updatedSubMenuLS.includes(index))
       );
       setUpdatedSubMenuLS(updatedSubMenuLS);
       setIsLocalStorageUpdated(true);
@@ -96,13 +101,17 @@ const SidebarDashboard = (props: Props) => {
 
   useEffect(() => {
     if (!isLocalStorageUpdated) {
-      const updatedSubMenuLS = JSON.parse(localStorage.getItem('updatedSubMenu') || '[]');
+      const updatedSubMenuLS = JSON.parse(
+        localStorage.getItem("updatedSubMenu") || "[]"
+      );
       setShowSubMenu(
-        new Array(SidebarDataDashboard.length).fill(false).map((_, index) => updatedSubMenuLS.includes(index))
+        new Array(SidebarDataDashboard.length)
+          .fill(false)
+          .map((_, index) => updatedSubMenuLS.includes(index))
       );
     }
   }, [isLocalStorageUpdated]);
-  
+
   return (
     <>
       <div className="flex">

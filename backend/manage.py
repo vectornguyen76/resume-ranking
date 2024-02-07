@@ -1,5 +1,6 @@
 from app.db import db
 
+
 def create_db():
     """
     Create Database.
@@ -24,8 +25,9 @@ def drop_db():
     db.drop_all()
     db.session.commit()
 
+
 def init_app(app):
-    if app.config['APP_ENV'] == 'production':
+    if app.config["APP_ENV"] == "production":
         commands = [create_db, reset_db, drop_db]
     else:
         commands = [create_db, reset_db, drop_db]

@@ -1,25 +1,32 @@
 "use client";
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect } from "react";
 
 import { createColumnHelper, Row } from "@tanstack/react-table";
 import { TablePagination, Drawer } from "@mui/material";
 import { useForm } from "react-hook-form";
 import { ToastContainer, toast } from "react-toastify";
-import UseTableTanStackSSR from '@/app/hooks/react-table/useTableTanStackSSR';
+import UseTableTanStackSSR from "@/app/hooks/react-table/useTableTanStackSSR";
 import { Menu, Dialog, Transition } from "@headlessui/react";
-import { useMachingData, useFAQData, useMatchingPageData, useAllJobData, useDetailFAQData, useDeleteFAQData, useAddFAQData, useUpdateFAQData } from '@/app/hooks/react-query/logging/faq/useFAQData';
 import {
-  useMatchingDetailData,
-} from "@/app/hooks/react-query/management/file/useFilesUploadData";
+  useMachingData,
+  useFAQData,
+  useMatchingPageData,
+  useAllJobData,
+  useDetailFAQData,
+  useDeleteFAQData,
+  useAddFAQData,
+  useUpdateFAQData,
+} from "@/app/hooks/react-query/logging/faq/useFAQData";
+import { useMatchingDetailData } from "@/app/hooks/react-query/management/file/useFilesUploadData";
 
 import { BsChevronDown } from "react-icons/bs";
-import { MdLightbulbOutline, MdLightbulb } from 'react-icons/md';
+import { MdLightbulbOutline, MdLightbulb } from "react-icons/md";
 
 function classNames(...classes: (string | undefined)[]) {
-  return classes.filter(Boolean).join(' ')
+  return classes.filter(Boolean).join(" ");
 }
 
-type Props = {}
+type Props = {};
 
 interface InputItem {
   documentname: string;
@@ -32,32 +39,35 @@ type FormModel = {
 };
 
 interface DataFormModel {
-  id?: number,
-  job_name: string,
-  job_description: string,
+  id?: number;
+  job_name: string;
+  job_description: string;
 }
 
 const TableFAQ = (props: Props) => {
   const [currentPage, setCurrentPage] = React.useState<number>(0);
   const [pageSize, setPageSize] = React.useState<number>(10);
   const [isOpenDrawer, setIsOpenDrawer] = React.useState<boolean>(false);
-  const [isOpenModalDelete, setIsOpenModalDelete] = React.useState<boolean>(false);
+  const [isOpenModalDelete, setIsOpenModalDelete] =
+    React.useState<boolean>(false);
   const [isOpenModalAdd, setIsOpenModalAdd] = React.useState<boolean>(false);
-  const [isOpenModalUpdate, setIsOpenModalUpdate] = React.useState<boolean>(false);
+  const [isOpenModalUpdate, setIsOpenModalUpdate] =
+    React.useState<boolean>(false);
   const [fetching, setIsFetching] = React.useState<boolean>(false);
   const [faqId, setFaqId] = React.useState<number>(-1);
   const [inputs, setInputs] = React.useState<InputItem[] | []>([]);
   const [CandidateId, setCandidateId] = React.useState<number>(1);
   const [selectedJobId, setSelectedJobId] = React.useState<number>(0);
-  const candidateDetailQuery = useMatchingDetailData(CandidateId, selectedJobId);
+  const candidateDetailQuery = useMatchingDetailData(
+    CandidateId,
+    selectedJobId
+  );
   const [loadingMatching, setLoadingMatching] = React.useState<boolean>(false);
 
-  const [dataForm, setDataForm] = React.useState<DataFormModel>(
-    {
-      job_name: "",
-      job_description: "",
-    }
-  )
+  const [dataForm, setDataForm] = React.useState<DataFormModel>({
+    job_name: "",
+    job_description: "",
+  });
 
   // const { data, isLoading, isError, isPreviousData, refetch } = useFAQData((currentPage + 1), pageSize);
   // const { data: detailFAQData, isLoading: isDetailFAQLoading, refetch: refetchDetailFAQData, isSuccess } = useDetailFAQData(faqId);
@@ -68,9 +78,11 @@ const TableFAQ = (props: Props) => {
   const { mutate: updateFAQ } = useUpdateFAQData(dataForm, faqId);
 
   // Define a state variable to store the selected job name
-  const [selectedJobName, setSelectedJobName] = useState<string>('Position Name');
+  const [selectedJobName, setSelectedJobName] =
+    useState<string>("Position Name");
   const { mutate: processMatching } = useMachingData(selectedJobName);
-  const { data, isLoading, isError, isPreviousData, refetch } = useMatchingPageData(selectedJobName, (currentPage + 1), pageSize);
+  const { data, isLoading, isError, isPreviousData, refetch } =
+    useMatchingPageData(selectedJobName, currentPage + 1, pageSize);
 
   // Create a function to periodically refetch data
   const startAutoRefresh = () => {
@@ -98,7 +110,6 @@ const TableFAQ = (props: Props) => {
     };
   }, []); // The empty dependency array ensures this effect runs only once when the component mounts
 
-
   // Handle item selection
   const handleMenuItemClick = async (jobId: number, jobName: string) => {
     await setSelectedJobId(jobId);
@@ -114,18 +125,16 @@ const TableFAQ = (props: Props) => {
     reset,
     formState: { errors },
   } = useForm<FormModel>({
-    defaultValues: {
-
-    },
+    defaultValues: {},
   });
 
   const handlePageOnchange = (event: any, newPage: number) => {
-    setCurrentPage(newPage)
+    setCurrentPage(newPage);
   };
 
   const handleChangeRowsPerPage = (event: any) => {
-    setPageSize(event.target.value)
-  }
+    setPageSize(event.target.value);
+  };
   const handleDrawerClose = () => {
     setIsOpenDrawer(false);
   };
@@ -149,33 +158,27 @@ const TableFAQ = (props: Props) => {
       header: "ID",
       cell: ({ row }: { row: Row<any> }) => {
         return (
-          <div>{currentPage !== 0 ? (
-            <>
-              {currentPage * 10 + (row.index + 1)}
-            </>
-          ) : (<>{row.index + 1}</>)}</div>
+          <div>
+            {currentPage !== 0 ? (
+              <>{currentPage * 10 + (row.index + 1)}</>
+            ) : (
+              <>{row.index + 1}</>
+            )}
+          </div>
         );
       },
     }),
     columnHelper.display({
       header: "Candidate Name",
       cell: ({ row }: { row: Row<any> }) => {
-        return (
-          <>
-            {row.original.candidate_name}
-          </>
-        )
-      }
+        return <>{row.original.candidate_name}</>;
+      },
     }),
     columnHelper.display({
       header: "Email Address",
       cell: ({ row }: { row: Row<any> }) => {
-        return (
-          <>
-            {row.original.candidate_email}
-          </>
-        )
-      }
+        return <>{row.original.candidate_email}</>;
+      },
     }),
     columnHelper.accessor("comment", {
       header: "Comment",
@@ -184,10 +187,16 @@ const TableFAQ = (props: Props) => {
         if (!row.original.comment) {
           return null;
         }
-        const content = showFullContent ? row.original.comment : row.original.comment.slice(0, 200);
+        const content = showFullContent
+          ? row.original.comment
+          : row.original.comment.slice(0, 200);
         return (
           <>
-            <div className="whitespace-pre-line text-left" id="answer" dangerouslySetInnerHTML={{ __html: content }} />
+            <div
+              className="whitespace-pre-line text-left"
+              id="answer"
+              dangerouslySetInnerHTML={{ __html: content }}
+            />
             {row.original.comment.length > 200 && (
               <button
                 className="text-blue-500 hover:underline focus:outline-none"
@@ -198,7 +207,7 @@ const TableFAQ = (props: Props) => {
             )}
           </>
         );
-      }
+      },
     }),
 
     columnHelper.accessor("score", {
@@ -234,26 +243,31 @@ const TableFAQ = (props: Props) => {
           //   {score}%
           // </div>
           <div className={`text-sm font-semibold ${textColor}`}>
-            {selectedJobName === 'Position Name' ? null : `${score}%`}
+            {selectedJobName === "Position Name" ? null : `${score}%`}
           </div>
-
         );
-      }
+      },
     }),
     columnHelper.display({
       header: "Status",
       cell: ({ row }: { row: Row<any> }) => {
         // Determine the CSS class based on the matching_status
-        const statusClass = row.original.matching_status ? "bg-green-400" : "bg-red-400";
+        const statusClass = row.original.matching_status
+          ? "bg-green-400"
+          : "bg-red-400";
         // Convert matching_status to a string
-        const statusString = row.original.matching_status ? "Matched" : "Pending";
+        const statusString = row.original.matching_status
+          ? "Matched"
+          : "Pending";
 
         return (
-          <div className={`inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs font-semibold text-gray-100 ${statusClass}`}>
+          <div
+            className={`inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs font-semibold text-gray-100 ${statusClass}`}
+          >
             {statusString}
           </div>
         );
-      }
+      },
     }),
     columnHelper.display({
       header: "Action",
@@ -268,7 +282,7 @@ const TableFAQ = (props: Props) => {
             >
               Detail
             </button>
-            {/* 
+            {/*
             <button className="p-2 mr-2 text-xs font-medium text-center text-white bg-blue-700 rounded-sm hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" onClick={() => handleModifyFAQ(row.original.id)}>
               Update
             </button> */}
@@ -276,8 +290,8 @@ const TableFAQ = (props: Props) => {
               Delete
             </button> */}
           </>
-        )
-      }
+        );
+      },
     }),
   ];
 
@@ -285,14 +299,20 @@ const TableFAQ = (props: Props) => {
     return (
       <div className="px-4 pt-6 mt-2">
         <div className="font-medium text-xl p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:text-white dark:border-gray-700 sm:p-6 dark:bg-gray-800">
-          <h4 className="animate-pulse text-center text-blue-500">Loading ...</h4>
+          <h4 className="animate-pulse text-center text-blue-500">
+            Loading ...
+          </h4>
         </div>
       </div>
     );
   }
 
   if (isError) {
-    return <h4 className="text-center text-red-500 font-medium text-xl">System Error Please Try Again Later !</h4>;
+    return (
+      <h4 className="text-center text-red-500 font-medium text-xl">
+        System Error Please Try Again Later !
+      </h4>
+    );
   }
 
   const handleMatchingCandidate = async () => {
@@ -310,16 +330,15 @@ const TableFAQ = (props: Props) => {
           onSuccess: async () => {
             setLoadingMatching(false);
             setIsOpenModalAdd(false);
-            setInputs([])
-            refetch()
-            reset()
+            setInputs([]);
+            refetch();
+            reset();
             toast.success("Process Matching Candidate success");
           },
         }
       );
     }
-
-  }
+  };
 
   const confirmDeleteFAQ = () => {
     deleteFAQ(
@@ -327,24 +346,22 @@ const TableFAQ = (props: Props) => {
       {
         onError: (error: any) => {
           console.log("Delete FAQ error:", error.response.status);
-          setIsOpenModalDelete(false)
-          toast.error("Delete FAQ Failed")
+          setIsOpenModalDelete(false);
+          toast.error("Delete FAQ Failed");
         },
         onSuccess: async () => {
-          setIsOpenModalDelete(false)
-          refetch()
+          setIsOpenModalDelete(false);
+          refetch();
           toast.success("Delete FAQ success");
         },
       }
-    )
-  }
+    );
+  };
 
   // if (isSuccess) {
   //   setValue2('job_name', detailFAQData.job_name)
   //   setValue2('job_description', detailFAQData.job_description)
   // }
-
-
 
   //Submit form add FAQ
   const confirmAddFAQ = async (data: FormModel): Promise<void> => {
@@ -353,31 +370,34 @@ const TableFAQ = (props: Props) => {
       job_description: data.job_description,
     };
 
-    if (Array.isArray(inputs) && inputs.every((input) => input.documentname.trim().length > 0)) {
+    if (
+      Array.isArray(inputs) &&
+      inputs.every((input) => input.documentname.trim().length > 0)
+    ) {
       // params.documents = inputs.map((input) => ({
       //   page: input.page.toString(),
       //   document: input.documentname,
       // }));
-      alert('oke');
+      alert("oke");
     } else {
-      alert('Document name is required.');
+      alert("Document name is required.");
       return;
     }
-    console.log(params)
+    console.log(params);
     await setDataForm(params);
 
     addFAQ(
       {},
       {
         onError: (error: any) => {
-          console.log('Create FAQ error:', error.response.status);
+          console.log("Create FAQ error:", error.response.status);
           toast.error("Create FAQ failed");
         },
         onSuccess: async () => {
           setIsOpenModalAdd(false);
-          setInputs([])
-          refetch()
-          reset()
+          setInputs([]);
+          refetch();
+          reset();
           toast.success("Create FAQ success");
         },
       }
@@ -386,51 +406,50 @@ const TableFAQ = (props: Props) => {
 
   //Submit form update FAQ
   const confirmUpdateFAQ = async (data: FormModel) => {
-
     const params = {
       job_name: data.job_name,
       job_description: data.job_description,
     };
 
     await setDataForm(params);
-    console.log(params)
+    console.log(params);
     updateFAQ(
       {},
       {
         onError: (error: any) => {
-          console.log('Update FAQ error:', error.response.status);
+          console.log("Update FAQ error:", error.response.status);
           toast.success("Update FAQ failed");
         },
         onSuccess: async () => {
           setIsOpenModalUpdate(false);
-          setInputs([])
-          refetch()
-          reset()
+          setInputs([]);
+          refetch();
+          reset();
           toast.success("Update FAQ success");
         },
       }
-    )
-  }
+    );
+  };
 
   const handleDeleteFAQ = (faqId: number) => {
-    setIsOpenModalDelete(true)
-    setFaqId(faqId)
-  }
+    setIsOpenModalDelete(true);
+    setFaqId(faqId);
+  };
 
   const closeModal = () => {
-    setIsOpenModalDelete(false)
-    setIsOpenModalAdd(false)
-    setIsOpenModalUpdate(false)
-    setInputs([])
-    reset()
-  }
+    setIsOpenModalDelete(false);
+    setIsOpenModalAdd(false);
+    setIsOpenModalUpdate(false);
+    setInputs([]);
+    reset();
+  };
 
   const validateDocumentName = (documentname: string) => {
     return documentname.trim().length > 0;
   };
 
   const addInput = (): void => {
-    setInputs([...inputs, { documentname: '', page: 0 }]);
+    setInputs([...inputs, { documentname: "", page: 0 }]);
   };
 
   const handleInputChange = (index: number, event: any) => {
@@ -439,7 +458,6 @@ const TableFAQ = (props: Props) => {
     updatedInputs[index] = { ...updatedInputs[index], [name]: value };
     setInputs(updatedInputs);
   };
-
 
   // Cast score to a number
   const score = Number(candidateDetailQuery.data?.score);
@@ -477,30 +495,32 @@ const TableFAQ = (props: Props) => {
         theme="dark"
       />
       <div className="flex pr-20 justify-between">
-
         <button
           type="button"
-          className={`flex mb-4 px-3 py-2 text-sm font-medium text-center text-white rounded-lg focus:outline-none ${loadingMatching
-              ? 'bg-gray-300 cursor-not-allowed'
-              : 'bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800'
-            }`}
+          className={`flex mb-4 px-3 py-2 text-sm font-medium text-center text-white rounded-lg focus:outline-none ${
+            loadingMatching
+              ? "bg-gray-300 cursor-not-allowed"
+              : "bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+          }`}
           onClick={() => handleMatchingCandidate()}
           disabled={loadingMatching}
         >
           {loadingMatching ? (
-            <MdLightbulb style={{ fontSize: '18px' }} className="mr-2" />
+            <MdLightbulb style={{ fontSize: "18px" }} className="mr-2" />
           ) : (
-            <MdLightbulbOutline style={{ fontSize: '18px' }} className="mr-2" />
+            <MdLightbulbOutline style={{ fontSize: "18px" }} className="mr-2" />
           )}
-          {loadingMatching ? 'Matching...' : 'Match'}
+          {loadingMatching ? "Matching..." : "Match"}
         </button>
-
 
         <Menu as="div" className="relative inline-block text-left">
           <div>
             <Menu.Button className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
               {selectedJobName} {/* Display the selected job name */}
-              <BsChevronDown className="-mr-1 h-5 w-5 text-gray-400" aria-hidden="true" />
+              <BsChevronDown
+                className="-mr-1 h-5 w-5 text-gray-400"
+                aria-hidden="true"
+              />
             </Menu.Button>
           </div>
 
@@ -520,10 +540,14 @@ const TableFAQ = (props: Props) => {
                     {({ active }) => (
                       <a
                         href="#"
-                        onClick={() => handleMenuItemClick(item.id, item.job_name)} // Handle item click
+                        onClick={() =>
+                          handleMenuItemClick(item.id, item.job_name)
+                        } // Handle item click
                         className={classNames(
-                          active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
-                          'block px-4 py-2 text-sm'
+                          active
+                            ? "bg-gray-100 text-gray-900"
+                            : "text-gray-700",
+                          "block px-4 py-2 text-sm"
                         )}
                       >
                         {item.job_name}
@@ -648,10 +672,15 @@ const TableFAQ = (props: Props) => {
                   >
                     Create New Job
                   </Dialog.Title>
-                  <form className="w-full" onSubmit={handleSubmit(confirmAddFAQ)}>
+                  <form
+                    className="w-full"
+                    onSubmit={handleSubmit(confirmAddFAQ)}
+                  >
                     <div className="grid gap-4 mb-4 sm:grid-cols-2 sm:gap-6 sm:mb-5 mt-8">
                       <div className="sm:col-span-2">
-                        <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Job Name</label>
+                        <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                          Job Name
+                        </label>
                         <input
                           type="text"
                           className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
@@ -661,7 +690,9 @@ const TableFAQ = (props: Props) => {
                     </div>
                     <div className="grid gap-4 mb-4 sm:grid-cols-2 sm:gap-6 sm:mb-5">
                       <div className="sm:col-span-2">
-                        <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Job Description</label>
+                        <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                          Job Description
+                        </label>
                         <input
                           type="text"
                           className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
@@ -696,7 +727,9 @@ const TableFAQ = (props: Props) => {
       {/* Drawer */}
       <Drawer anchor="right" open={isOpenDrawer} onClose={handleDrawerClose}>
         <div className="flex items-center p-2 justify-center bg-blue-700 text-white">
-          <div className="text-base font-bold">Detail Analyse Matching Candidate</div>
+          <div className="text-base font-bold">
+            Detail Analyse Matching Candidate
+          </div>
         </div>
         <div className="w-[500px] text-sm">
           {fetching ? (
@@ -708,9 +741,10 @@ const TableFAQ = (props: Props) => {
                   Candidate Name
                 </div>
                 <p className="text-sm leading-6 text-gray-60">
-                  {candidateDetailQuery.data?.candidate_name ? candidateDetailQuery.data?.candidate_name : 'None'}
+                  {candidateDetailQuery.data?.candidate_name
+                    ? candidateDetailQuery.data?.candidate_name
+                    : "None"}
                 </p>
-
               </div>
 
               <div className="p-2">
@@ -718,9 +752,10 @@ const TableFAQ = (props: Props) => {
                   Candidate Phone Number
                 </div>
                 <p className="text-sm leading-6 text-gray-60">
-                  {candidateDetailQuery.data?.candidate_phone ? candidateDetailQuery.data?.candidate_phone : 'None'}
+                  {candidateDetailQuery.data?.candidate_phone
+                    ? candidateDetailQuery.data?.candidate_phone
+                    : "None"}
                 </p>
-
               </div>
 
               <div className="p-2">
@@ -728,9 +763,10 @@ const TableFAQ = (props: Props) => {
                   Candidate CV Name
                 </div>
                 <p className="text-sm leading-6 text-gray-60">
-                  {candidateDetailQuery.data?.cv_name ? candidateDetailQuery.data?.cv_name : 'None'}
+                  {candidateDetailQuery.data?.cv_name
+                    ? candidateDetailQuery.data?.cv_name
+                    : "None"}
                 </p>
-
               </div>
 
               <div className="p-2">
@@ -738,9 +774,10 @@ const TableFAQ = (props: Props) => {
                   Job Name
                 </div>
                 <p className="text-sm leading-6 text-gray-60">
-                  {candidateDetailQuery.data?.job_name ? candidateDetailQuery.data?.job_name : 'None'}
+                  {candidateDetailQuery.data?.job_name
+                    ? candidateDetailQuery.data?.job_name
+                    : "None"}
                 </p>
-
               </div>
 
               <div className="p-2">
@@ -748,9 +785,11 @@ const TableFAQ = (props: Props) => {
                   Matching Score
                 </div>
                 <p className={`text-sm font-semibold leading-6 ${textColor}`}>
-                  {candidateDetailQuery.data?.score ? candidateDetailQuery.data?.score : '0'}%
+                  {candidateDetailQuery.data?.score
+                    ? candidateDetailQuery.data?.score
+                    : "0"}
+                  %
                 </p>
-
               </div>
 
               <div className="p-2">
@@ -758,7 +797,9 @@ const TableFAQ = (props: Props) => {
                   Summary Analyse Candidate
                 </div>
                 <p className="text-sm leading-6 text-gray-60">
-                  {candidateDetailQuery.data?.comment ? candidateDetailQuery.data?.comment : 'None'}
+                  {candidateDetailQuery.data?.comment
+                    ? candidateDetailQuery.data?.comment
+                    : "None"}
                 </p>
               </div>
 
@@ -767,7 +808,9 @@ const TableFAQ = (props: Props) => {
                   Recommended Jobs
                 </div>
                 <p className="text-sm leading-6 text-gray-60">
-                  {candidateDetailQuery.data?.recommended_jobs ? candidateDetailQuery.data?.recommended_jobs : 'None'}
+                  {candidateDetailQuery.data?.recommended_jobs
+                    ? candidateDetailQuery.data?.recommended_jobs
+                    : "None"}
                 </p>
               </div>
 
@@ -776,10 +819,16 @@ const TableFAQ = (props: Props) => {
                   Analyse Educations
                 </div>
                 <p className="px-2 text-sm leading-6 text-gray-60">
-                  Comment: {candidateDetailQuery.data?.education_comment ? candidateDetailQuery.data?.education_comment : 'None'}
+                  Comment:{" "}
+                  {candidateDetailQuery.data?.education_comment
+                    ? candidateDetailQuery.data?.education_comment
+                    : "None"}
                 </p>
                 <p className="px-2 text-sm leading-6 text-gray-60">
-                  Score: {candidateDetailQuery.data?.education_score ? candidateDetailQuery.data?.education_score : 'None'}
+                  Score:{" "}
+                  {candidateDetailQuery.data?.education_score
+                    ? candidateDetailQuery.data?.education_score
+                    : "None"}
                 </p>
               </div>
 
@@ -788,10 +837,16 @@ const TableFAQ = (props: Props) => {
                   Experiences
                 </div>
                 <p className="px-2 text-sm leading-6 text-gray-60">
-                  Comment: {candidateDetailQuery.data?.experiment_comment ? candidateDetailQuery.data?.experiment_comment : 'None'}
+                  Comment:{" "}
+                  {candidateDetailQuery.data?.experiment_comment
+                    ? candidateDetailQuery.data?.experiment_comment
+                    : "None"}
                 </p>
                 <p className="px-2 text-sm leading-6 text-gray-60">
-                  Score: {candidateDetailQuery.data?.experiment_score ? candidateDetailQuery.data?.experiment_score : 'None'}
+                  Score:{" "}
+                  {candidateDetailQuery.data?.experiment_score
+                    ? candidateDetailQuery.data?.experiment_score
+                    : "None"}
                 </p>
               </div>
 
@@ -800,10 +855,16 @@ const TableFAQ = (props: Props) => {
                   Responsibilities
                 </div>
                 <p className="px-2 text-sm leading-6 text-gray-60">
-                  Comment: {candidateDetailQuery.data?.responsibilities_comment ? candidateDetailQuery.data?.responsibilities_comment : 'None'}
+                  Comment:{" "}
+                  {candidateDetailQuery.data?.responsibilities_comment
+                    ? candidateDetailQuery.data?.responsibilities_comment
+                    : "None"}
                 </p>
                 <p className="px-2 text-sm leading-6 text-gray-60">
-                  Score: {candidateDetailQuery.data?.responsibilities_score ? candidateDetailQuery.data?.responsibilities_score : 'None'}
+                  Score:{" "}
+                  {candidateDetailQuery.data?.responsibilities_score
+                    ? candidateDetailQuery.data?.responsibilities_score
+                    : "None"}
                 </p>
               </div>
 
@@ -812,10 +873,16 @@ const TableFAQ = (props: Props) => {
                   Technicall Skills
                 </div>
                 <p className="px-2 text-sm leading-6 text-gray-60">
-                  Comment: {candidateDetailQuery.data?.technical_skills_comment ? candidateDetailQuery.data?.technical_skills_comment : 'None'}
+                  Comment:{" "}
+                  {candidateDetailQuery.data?.technical_skills_comment
+                    ? candidateDetailQuery.data?.technical_skills_comment
+                    : "None"}
                 </p>
                 <p className="px-2 text-sm leading-6 text-gray-60">
-                  Score: {candidateDetailQuery.data?.technical_skills_score ? candidateDetailQuery.data?.technical_skills_score : 'None'}
+                  Score:{" "}
+                  {candidateDetailQuery.data?.technical_skills_score
+                    ? candidateDetailQuery.data?.technical_skills_score
+                    : "None"}
                 </p>
               </div>
 
@@ -824,10 +891,16 @@ const TableFAQ = (props: Props) => {
                   Soft Skills
                 </div>
                 <p className="px-2 text-sm leading-6 text-gray-60">
-                  Comment: {candidateDetailQuery.data?.soft_skills_comment ? candidateDetailQuery.data?.soft_skills_comment : 'None'}
+                  Comment:{" "}
+                  {candidateDetailQuery.data?.soft_skills_comment
+                    ? candidateDetailQuery.data?.soft_skills_comment
+                    : "None"}
                 </p>
                 <p className="px-2 text-sm leading-6 text-gray-60">
-                  Score: {candidateDetailQuery.data?.soft_skills_score ? candidateDetailQuery.data?.soft_skills_score : 'None'}
+                  Score:{" "}
+                  {candidateDetailQuery.data?.soft_skills_score
+                    ? candidateDetailQuery.data?.soft_skills_score
+                    : "None"}
                 </p>
               </div>
 
@@ -836,13 +909,18 @@ const TableFAQ = (props: Props) => {
                   Certificates
                 </div>
                 <p className="px-2 text-sm leading-6 text-gray-60">
-                  Comment: {candidateDetailQuery.data?.certification_comment ? candidateDetailQuery.data?.certification_comment : 'None'}
+                  Comment:{" "}
+                  {candidateDetailQuery.data?.certification_comment
+                    ? candidateDetailQuery.data?.certification_comment
+                    : "None"}
                 </p>
                 <p className="px-2 text-sm leading-6 text-gray-60">
-                  Score: {candidateDetailQuery.data?.certification_score ? candidateDetailQuery.data?.certification_score : 'None'}
+                  Score:{" "}
+                  {candidateDetailQuery.data?.certification_score
+                    ? candidateDetailQuery.data?.certification_score
+                    : "None"}
                 </p>
               </div>
-
             </>
           )}
         </div>
@@ -888,7 +966,7 @@ const TableFAQ = (props: Props) => {
         </Dialog>
       </Transition>
     </>
-  )
-}
+  );
+};
 
-export default TableFAQ
+export default TableFAQ;

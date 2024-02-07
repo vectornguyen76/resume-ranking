@@ -1,18 +1,25 @@
 "use client";
-import React, { useMemo } from 'react'
+import React, { useMemo } from "react";
 
 import { createColumnHelper, Row } from "@tanstack/react-table";
 import { TablePagination, Drawer, Skeleton } from "@mui/material";
 import { Controller, useForm } from "react-hook-form";
 import { ToastContainer, toast } from "react-toastify";
-import UseTableTanStackSSR from '@/app/hooks/react-table/useTableTanStackSSR';
+import UseTableTanStackSSR from "@/app/hooks/react-table/useTableTanStackSSR";
 import { Dialog, Transition } from "@headlessui/react";
-import { useJobDetailData, useFAQData, useDetailFAQData, useDeleteFAQData, useAddFAQData, useUpdateFAQData } from '@/app/hooks/react-query/logging/faq/useFAQData';
-import 'react-quill/dist/quill.snow.css'; // Import Quill 
+import {
+  useJobDetailData,
+  useFAQData,
+  useDetailFAQData,
+  useDeleteFAQData,
+  useAddFAQData,
+  useUpdateFAQData,
+} from "@/app/hooks/react-query/logging/faq/useFAQData";
+import "react-quill/dist/quill.snow.css"; // Import Quill
 
 import dynamic from "next/dynamic";
 
-type Props = {}
+type Props = {};
 
 interface InputItem {
   documentname: string;
@@ -25,9 +32,9 @@ type FormModel = {
 };
 
 interface DataFormModel {
-  id?: number,
-  job_name: string,
-  job_description: string,
+  id?: number;
+  job_name: string;
+  job_description: string;
 }
 
 const TableJobs = (props: Props) => {
@@ -37,23 +44,34 @@ const TableJobs = (props: Props) => {
 
   const [currentPage, setCurrentPage] = React.useState<number>(0);
   const [pageSize, setPageSize] = React.useState<number>(10);
-  const [isOpenModalDelete, setIsOpenModalDelete] = React.useState<boolean>(false);
+  const [isOpenModalDelete, setIsOpenModalDelete] =
+    React.useState<boolean>(false);
   const [isOpenModalAdd, setIsOpenModalAdd] = React.useState<boolean>(false);
-  const [isOpenModalUpdate, setIsOpenModalUpdate] = React.useState<boolean>(false);
+  const [isOpenModalUpdate, setIsOpenModalUpdate] =
+    React.useState<boolean>(false);
   const [fetching, setIsFetching] = React.useState<boolean>(false);
   const [faqId, setFaqId] = React.useState<number>(-1);
   const [inputs, setInputs] = React.useState<InputItem[] | []>([]);
   const [loading, setLoading] = React.useState<boolean>(false);
-  const [dataForm, setDataForm] = React.useState<DataFormModel>(
-    {
-      job_name: "",
-      job_description: "",
-    }
-  )
-  const ReactQuill = useMemo(() => dynamic(() => import('react-quill'), { ssr: false }), []);
+  const [dataForm, setDataForm] = React.useState<DataFormModel>({
+    job_name: "",
+    job_description: "",
+  });
+  const ReactQuill = useMemo(
+    () => dynamic(() => import("react-quill"), { ssr: false }),
+    []
+  );
 
-  const { data, isLoading, isError, isPreviousData, refetch } = useFAQData((currentPage + 1), pageSize);
-  const { data: detailFAQData, isLoading: isDetailFAQLoading, refetch: refetchDetailFAQData, isSuccess } = useDetailFAQData(faqId);
+  const { data, isLoading, isError, isPreviousData, refetch } = useFAQData(
+    currentPage + 1,
+    pageSize
+  );
+  const {
+    data: detailFAQData,
+    isLoading: isDetailFAQLoading,
+    refetch: refetchDetailFAQData,
+    isSuccess,
+  } = useDetailFAQData(faqId);
 
   const { mutate: deleteFAQ } = useDeleteFAQData(faqId);
   const { mutate: addFAQ } = useAddFAQData(dataForm);
@@ -65,7 +83,6 @@ const TableJobs = (props: Props) => {
     setText(value);
   };
 
-
   const {
     register,
     handleSubmit,
@@ -75,10 +92,9 @@ const TableJobs = (props: Props) => {
   } = useForm<FormModel>({
     defaultValues: {
       job_name: "",
-      job_description:
-        `<h2>Job Brief:</h2>
+      job_description: `<h2>Job Brief:</h2>
       <p>We're seeking an AI Engineer to develop and implement AI solutions. You'll work on cutting-edge projects, designing, training, and integrating machine learning models.</p>
-      
+
       <h3>Responsibilities:</h3>
       <ol>
         <li>Develop and optimize AI algorithms/models.</li>
@@ -88,7 +104,7 @@ const TableJobs = (props: Props) => {
         <li>Ensure system scalability and performance.</li>
         <li>Provide documentation and technical support.</li>
       </ol>
-      
+
       <h3>Requirements:</h3>
       <ul>
         <li>Bachelor's degree in Computer Science or related field.</li>
@@ -100,7 +116,7 @@ const TableJobs = (props: Props) => {
         <li>Problem-solving skills.</li>
         <li>Excellent communication and teamwork.</li>
       </ul>`,
-    }
+    },
   });
 
   const {
@@ -111,16 +127,16 @@ const TableJobs = (props: Props) => {
     reset: reset2,
     formState: { errors: errors2 },
   } = useForm<FormModel>({
-    defaultValues: { job_name: detailFAQData?.job_name }
+    defaultValues: { job_name: detailFAQData?.job_name },
   });
 
   const handlePageOnchange = (event: any, newPage: number) => {
-    setCurrentPage(newPage)
+    setCurrentPage(newPage);
   };
 
   const handleChangeRowsPerPage = (event: any) => {
-    setPageSize(event.target.value)
-  }
+    setPageSize(event.target.value);
+  };
 
   // const columnHelper = createColumnHelper<FAQModel>();
   const columnHelper = createColumnHelper<JobModel>();
@@ -129,23 +145,21 @@ const TableJobs = (props: Props) => {
       header: "ID",
       cell: ({ row }: { row: Row<any> }) => {
         return (
-          <div>{currentPage !== 0 ? (
-            <>
-              {currentPage * 10 + (row.index + 1)}
-            </>
-          ) : (<>{row.index + 1}</>)}</div>
+          <div>
+            {currentPage !== 0 ? (
+              <>{currentPage * 10 + (row.index + 1)}</>
+            ) : (
+              <>{row.index + 1}</>
+            )}
+          </div>
         );
       },
     }),
     columnHelper.display({
       header: "Position Name",
       cell: ({ row }: { row: Row<any> }) => {
-        return (
-          <>
-            {row.original.job_name}
-          </>
-        )
-      }
+        return <>{row.original.job_name}</>;
+      },
     }),
     columnHelper.accessor("job_description", {
       header: "Job Description",
@@ -154,10 +168,16 @@ const TableJobs = (props: Props) => {
         if (!row.original.job_description) {
           return null;
         }
-        const content = showFullContent ? row.original.job_description : row.original.job_description.slice(0, 200);
+        const content = showFullContent
+          ? row.original.job_description
+          : row.original.job_description.slice(0, 200);
         return (
           <>
-            <div className="whitespace-pre-line text-left" id="answer" dangerouslySetInnerHTML={{ __html: content }} />
+            <div
+              className="whitespace-pre-line text-left"
+              id="answer"
+              dangerouslySetInnerHTML={{ __html: content }}
+            />
             {row.original.job_description.length > 200 && (
               <button
                 className="text-blue-500 hover:underline focus:outline-none"
@@ -168,7 +188,7 @@ const TableJobs = (props: Props) => {
             )}
           </>
         );
-      }
+      },
     }),
     // columnHelper.display({
     //   header: "Documents",
@@ -205,18 +225,27 @@ const TableJobs = (props: Props) => {
       cell: ({ row }: { row: Row<any> }) => {
         return (
           <>
-            <button className="p-2 mr-2 rounded-lg text-xs font-medium text-center text-white bg-green-500 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800" onClick={() => handleModifyFAQ(row.original.id)}>
+            <button
+              className="p-2 mr-2 rounded-lg text-xs font-medium text-center text-white bg-green-500 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
+              onClick={() => handleModifyFAQ(row.original.id)}
+            >
               Update
             </button>
-            <button className="p-2 mr-2 rounded-lg text-xs font-medium text-center text-white bg-red-500 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800" onClick={() => handleDeleteFAQ(row.original.id)}>
+            <button
+              className="p-2 mr-2 rounded-lg text-xs font-medium text-center text-white bg-red-500 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800"
+              onClick={() => handleDeleteFAQ(row.original.id)}
+            >
               Delete
             </button>
-            <button className="p-2 mr-2 rounded-lg text-xs font-medium text-center text-white bg-blue-500 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" onClick={() => handleDetail(row.original.id)}>
+            <button
+              className="p-2 mr-2 rounded-lg text-xs font-medium text-center text-white bg-blue-500 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+              onClick={() => handleDetail(row.original.id)}
+            >
               Detail
             </button>
           </>
-        )
-      }
+        );
+      },
     }),
   ];
 
@@ -231,7 +260,11 @@ const TableJobs = (props: Props) => {
   }
 
   if (isError) {
-    return <h4 className="text-center text-red-500 font-medium text-xl">System Error Please Try Again Later !</h4>;
+    return (
+      <h4 className="text-center text-red-500 font-medium text-xl">
+        System Error Please Try Again Later !
+      </h4>
+    );
   }
 
   const handleModifyFAQ = async (faqId: number) => {
@@ -251,8 +284,8 @@ const TableJobs = (props: Props) => {
   };
 
   const handleAddFAQ = () => {
-    setIsOpenModalAdd(true)
-  }
+    setIsOpenModalAdd(true);
+  };
 
   const confirmDeleteFAQ = () => {
     deleteFAQ(
@@ -260,41 +293,41 @@ const TableJobs = (props: Props) => {
       {
         onError: (error: any) => {
           console.log("Delete FAQ error:", error.response.status);
-          setIsOpenModalDelete(false)
-          toast.error("Delete FAQ Failed")
+          setIsOpenModalDelete(false);
+          toast.error("Delete FAQ Failed");
         },
         onSuccess: async () => {
-          setIsOpenModalDelete(false)
-          refetch()
+          setIsOpenModalDelete(false);
+          refetch();
           toast.success("Delete FAQ success");
         },
       }
-    )
-  }
+    );
+  };
 
   if (isSuccess) {
-    setValue2('job_name', detailFAQData.job_name)
-    setValue2('job_description', detailFAQData.job_description)
+    setValue2("job_name", detailFAQData.job_name);
+    setValue2("job_description", detailFAQData.job_description);
   }
 
   //Submit form add FAQ
   const confirmAddFAQ = async (data: FormModel): Promise<void> => {
-    setLoading(true)
+    setLoading(true);
     const params = {
       job_name: data.job_name,
       job_description: data.job_description,
     };
 
     if (data.job_name.trim().length === 0) {
-      alert('Job name is required!');
+      alert("Job name is required!");
       return;
     }
 
     if (data.job_description.trim().length < 100) {
-      alert('Job description is too short!');
+      alert("Job description is too short!");
       return;
     }
-    console.log(params)
+    console.log(params);
     await setDataForm(params);
 
     addFAQ(
@@ -302,16 +335,16 @@ const TableJobs = (props: Props) => {
       {
         // onSettled
         onError: (error: any) => {
-          setLoading(false)
-          console.log('Create FAQ error:', error.response.status);
+          setLoading(false);
+          console.log("Create FAQ error:", error.response.status);
           toast.error("Create FAQ failed");
         },
         onSuccess: async () => {
-          setLoading(false)
+          setLoading(false);
           setIsOpenModalAdd(false);
-          setInputs([])
-          refetch()
-          reset()
+          setInputs([]);
+          refetch();
+          reset();
           toast.success("Create FAQ success");
         },
       }
@@ -320,7 +353,7 @@ const TableJobs = (props: Props) => {
 
   //Submit form update FAQ
   const confirmUpdateFAQ = async (data: FormModel) => {
-    setLoading(true)
+    setLoading(true);
     const params = {
       job_name: data.job_name,
       job_description: data.job_description,
@@ -337,46 +370,46 @@ const TableJobs = (props: Props) => {
     // }
 
     await setDataForm(params);
-    console.log(params)
+    console.log(params);
     updateFAQ(
       {},
       {
         onError: (error: any) => {
-          setLoading(false)
-          console.log('Update FAQ error:', error.response.status);
+          setLoading(false);
+          console.log("Update FAQ error:", error.response.status);
           toast.success("Update FAQ failed");
         },
         onSuccess: async () => {
-          setLoading(false)
+          setLoading(false);
           setIsOpenModalUpdate(false);
-          setInputs([])
-          refetch()
-          reset()
+          setInputs([]);
+          refetch();
+          reset();
           toast.success("Update FAQ success");
         },
       }
-    )
-  }
+    );
+  };
 
   const handleDeleteFAQ = (faqId: number) => {
-    setIsOpenModalDelete(true)
-    setFaqId(faqId)
-  }
+    setIsOpenModalDelete(true);
+    setFaqId(faqId);
+  };
 
   const closeModal = () => {
-    setIsOpenModalDelete(false)
-    setIsOpenModalAdd(false)
-    setIsOpenModalUpdate(false)
-    setInputs([])
-    reset()
-  }
+    setIsOpenModalDelete(false);
+    setIsOpenModalAdd(false);
+    setIsOpenModalUpdate(false);
+    setInputs([]);
+    reset();
+  };
 
   const validateDocumentName = (documentname: string) => {
     return documentname.trim().length > 0;
   };
 
   const addInput = (): void => {
-    setInputs([...inputs, { documentname: '', page: 0 }]);
+    setInputs([...inputs, { documentname: "", page: 0 }]);
   };
 
   const handleInputChange = (index: number, event: any) => {
@@ -419,7 +452,6 @@ const TableJobs = (props: Props) => {
         className="mb-4 px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
         onClick={() => handleAddFAQ()}
       >
-
         Create New Job
       </button>
       <UseTableTanStackSSR columns={columns} data={data.results} />
@@ -501,7 +533,9 @@ const TableJobs = (props: Props) => {
       {/* Drawer */}
       <Drawer anchor="right" open={isOpenDrawer} onClose={handleDrawerClose}>
         <div className="flex items-center p-2 justify-center bg-blue-700 text-white">
-          <div className="text-base font-bold">Detail Analyse Job Description</div>
+          <div className="text-base font-bold">
+            Detail Analyse Job Description
+          </div>
         </div>
         <div className="w-[500px] text-sm">
           {fetching ? (
@@ -513,7 +547,9 @@ const TableJobs = (props: Props) => {
                   Job Name
                 </div>
                 <p className="text-sm leading-6 text-gray-60">
-                  {jobDetailQuery.data?.job_name ? jobDetailQuery.data?.job_name : 'None'}
+                  {jobDetailQuery.data?.job_name
+                    ? jobDetailQuery.data?.job_name
+                    : "None"}
                 </p>
 
                 <div className="mt-2 text-base font-semibold leading-7 text-gray-900">
@@ -561,11 +597,16 @@ const TableJobs = (props: Props) => {
                 <div className="px-2 max-w-[500px]">
                   {(jobDetailQuery.data?.technical_skills || []).length > 0 ? (
                     <div className="flex flex-wrap">
-                      {jobDetailQuery.data?.technical_skills.map((edu, index) => (
-                        <span className="rounded-full bg-blue-500 text-white px-2 py-1 m-1" key={index}>
-                          {edu.replace(/\s/g, '')}
-                        </span>
-                      ))}
+                      {jobDetailQuery.data?.technical_skills.map(
+                        (edu, index) => (
+                          <span
+                            className="rounded-full bg-blue-500 text-white px-2 py-1 m-1"
+                            key={index}
+                          >
+                            {edu.replace(/\s/g, "")}
+                          </span>
+                        )
+                      )}
                     </div>
                   ) : (
                     <div>None</div>
@@ -602,7 +643,9 @@ const TableJobs = (props: Props) => {
                   Job Created Date
                 </div>
                 <p className="text-sm leading-6 text-gray-60">
-                  {new Date(jobDetailQuery.data?.created_at).toLocaleDateString()}
+                  {new Date(
+                    jobDetailQuery.data?.created_at
+                  ).toLocaleDateString()}
                 </p>
               </div>
             </>
@@ -643,10 +686,15 @@ const TableJobs = (props: Props) => {
                   >
                     Create New Job
                   </Dialog.Title>
-                  <form className="w-full" onSubmit={handleSubmit(confirmAddFAQ)}>
+                  <form
+                    className="w-full"
+                    onSubmit={handleSubmit(confirmAddFAQ)}
+                  >
                     <div className="grid gap-4 mb-4 sm:grid-cols-2 sm:gap-6 sm:mb-5 mt-8">
                       <div className="sm:col-span-2">
-                        <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Position Name</label>
+                        <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                          Position Name
+                        </label>
                         <input
                           type="text"
                           className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
@@ -657,7 +705,9 @@ const TableJobs = (props: Props) => {
                     </div>
                     <div className="grid gap-4 mb-4 sm:grid-cols-2 sm:gap-6 sm:mb-5">
                       <div className="sm:col-span-2 h-72">
-                        <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Job Description</label>
+                        <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                          Job Description
+                        </label>
                         {/* <textarea
                           className="h-60 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500 resize-none"
                           {...register("job_description")}
@@ -669,21 +719,29 @@ const TableJobs = (props: Props) => {
                           render={({ field }) => (
                             <ReactQuill
                               {...field}
-                              theme='snow'
-                              scrollingContainer={'#list-faq'}
+                              theme="snow"
+                              scrollingContainer={"#list-faq"}
                               className="h-60 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500 resize-none"
                               modules={{
                                 toolbar: [
-                                  ['bold', 'italic', 'underline', 'strike'],
-                                  [{ list: 'ordered' }, { list: 'bullet' }],
-                                  ['link', 'image'],
+                                  ["bold", "italic", "underline", "strike"],
+                                  [{ list: "ordered" }, { list: "bullet" }],
+                                  ["link", "image"],
                                 ],
                               }}
-                              formats={['bold', 'italic', 'underline', 'strike', 'list', 'bullet', 'link', 'image']}
+                              formats={[
+                                "bold",
+                                "italic",
+                                "underline",
+                                "strike",
+                                "list",
+                                "bullet",
+                                "link",
+                                "image",
+                              ]}
                             />
                           )}
                         />
-
                       </div>
                     </div>
                     {/* <div className="grid gap-4 mb-4 sm:grid-cols-2 sm:gap-6 sm:mb-5">
@@ -753,7 +811,8 @@ const TableJobs = (props: Props) => {
                           >
                             No
                           </button>
-                        </>) : (
+                        </>
+                      ) : (
                         <>
                           <button
                             disabled={true}
@@ -772,7 +831,6 @@ const TableJobs = (props: Props) => {
                           </button>
                         </>
                       )}
-
                     </div>
                   </form>
                 </Dialog.Panel>
@@ -815,10 +873,15 @@ const TableJobs = (props: Props) => {
                   >
                     Update Job
                   </Dialog.Title>
-                  <form className="w-full" onSubmit={handleSubmit2(confirmUpdateFAQ)}>
+                  <form
+                    className="w-full"
+                    onSubmit={handleSubmit2(confirmUpdateFAQ)}
+                  >
                     <div className="grid gap-4 mb-4 sm:grid-cols-2 sm:gap-6 sm:mb-5 mt-8">
                       <div className="sm:col-span-2">
-                        <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Position Name</label>
+                        <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                          Position Name
+                        </label>
                         <input
                           type="text"
                           // name="job_name"
@@ -829,27 +892,36 @@ const TableJobs = (props: Props) => {
                     </div>
                     <div className="grid gap-4 mb-4 sm:grid-cols-2 sm:gap-6 sm:mb-5">
                       <div className="sm:col-span-2">
-                        <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Job Description</label>
+                        <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                          Job Description
+                        </label>
                         <Controller
                           name="job_description"
                           control={control2}
-                          defaultValue={
-                            detailFAQData?.job_description
-                          }
+                          defaultValue={detailFAQData?.job_description}
                           render={({ field }) => (
                             <ReactQuill
                               {...field}
-                              theme='snow'
-                              scrollingContainer={'#list-faq'}
+                              theme="snow"
+                              scrollingContainer={"#list-faq"}
                               className="h-60 bg-gray-50 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500 resize-none"
                               modules={{
                                 toolbar: [
-                                  ['bold', 'italic', 'underline', 'strike'],
-                                  [{ list: 'ordered' }, { list: 'bullet' }],
-                                  ['link', 'image'],
+                                  ["bold", "italic", "underline", "strike"],
+                                  [{ list: "ordered" }, { list: "bullet" }],
+                                  ["link", "image"],
                                 ],
                               }}
-                              formats={['bold', 'italic', 'underline', 'strike', 'list', 'bullet', 'link', 'image']}
+                              formats={[
+                                "bold",
+                                "italic",
+                                "underline",
+                                "strike",
+                                "list",
+                                "bullet",
+                                "link",
+                                "image",
+                              ]}
                             />
                           )}
                         />
@@ -924,7 +996,8 @@ const TableJobs = (props: Props) => {
                           >
                             No
                           </button>
-                        </>) : (
+                        </>
+                      ) : (
                         <>
                           <button
                             disabled={true}
@@ -945,7 +1018,6 @@ const TableJobs = (props: Props) => {
                       )}
                     </div>
                   </form>
-
                 </Dialog.Panel>
               </Transition.Child>
             </div>
@@ -953,7 +1025,7 @@ const TableJobs = (props: Props) => {
         </Dialog>
       </Transition>
     </>
-  )
-}
+  );
+};
 
-export default TableJobs
+export default TableJobs;

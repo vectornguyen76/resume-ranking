@@ -1,7 +1,8 @@
 from app.db import db
 
+
 class CandidateModel(db.Model):
-    __tablename__ = 'candidate'
+    __tablename__ = "candidate"
 
     id = db.Column(db.Integer, primary_key=True)
     candidate_name = db.Column(db.String())

@@ -1,11 +1,14 @@
 import React from "react";
-import { flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
+import {
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
 
 type Props = {
   data: any[];
   columns: any[];
 };
-
 
 const UseTableTanStackSSR = (props: Props) => {
   const table = useReactTable({

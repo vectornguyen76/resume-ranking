@@ -1,11 +1,9 @@
-import React from 'react'
+import React from "react";
 
-type Props = {}
+type Props = {};
 
 const ToggleMobileMenu = (props: Props) => {
-  return (
-    <div>ToggleMobileMenu</div>
-  )
-}
+  return <div>ToggleMobileMenu</div>;
+};
 
-export default ToggleMobileMenu
+export default ToggleMobileMenu;

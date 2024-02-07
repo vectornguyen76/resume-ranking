@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 services:
   frontend_service:
     container_name: frontend_container
@@ -28,7 +28,7 @@ services:
       - ./backend/cv_analysis:/app/cv_analysis
     depends_on:
       - db_service
-      
+
   db_service:
     container_name: db_container
     image: postgres:13.3

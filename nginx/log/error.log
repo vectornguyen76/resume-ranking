@@ -1,6 +1,6 @@
 2024/02/07 14:42:59 [notice] 1#1: using the "epoll" event method
 2024/02/07 14:42:59 [notice] 1#1: nginx/1.25.1
-2024/02/07 14:42:59 [notice] 1#1: built by gcc 12.2.1 20220924 (Alpine 12.2.1_git20220924-r4) 
+2024/02/07 14:42:59 [notice] 1#1: built by gcc 12.2.1 20220924 (Alpine 12.2.1_git20220924-r4)
 2024/02/07 14:42:59 [notice] 1#1: OS: Linux 5.10.16.3-microsoft-standard-WSL2
 2024/02/07 14:42:59 [notice] 1#1: getrlimit(RLIMIT_NOFILE): 1048576:1048576
 2024/02/07 14:42:59 [notice] 1#1: start worker processes

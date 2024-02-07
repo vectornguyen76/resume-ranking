@@ -1,13 +1,9 @@
-import React from 'react'
+import React from "react";
 
-type Props = {}
+type Props = {};
 
 const HeaderDashboard = (props: Props) => {
-  return (
-    <div>
-      HeaderDashboard
-    </div>
-  )
-}
+  return <div>HeaderDashboard</div>;
+};
 
-export default HeaderDashboard
+export default HeaderDashboard;
