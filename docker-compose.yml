@@ -29,7 +29,7 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     env_file:
-      - ./backend/.env.api.local
+      - ./backend/.env.local
     # ports:
     #   - 5000:5000
     restart: on-failure
