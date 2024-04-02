@@ -32,13 +32,13 @@ type FormModel = {
 };
 
 interface DataFormModel {
-  id?: number;
+  _id?: string;
   job_name: string;
   job_description: string;
 }
 
 const TableJobs = (props: Props) => {
-  const [jobId, setJobId] = React.useState<number>(0);
+  const [jobId, setJobId] = React.useState<string>("id");
   const jobDetailQuery = useJobDetailData(jobId);
   const [isOpenDrawer, setIsOpenDrawer] = React.useState<boolean>(false);
 
@@ -227,19 +227,19 @@ const TableJobs = (props: Props) => {
           <>
             <button
               className="p-2 mr-2 rounded-lg text-xs font-medium text-center text-white bg-green-500 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
-              onClick={() => handleModifyFAQ(row.original.id)}
+              onClick={() => handleModifyFAQ(row.original._id)}
             >
               Update
             </button>
             <button
               className="p-2 mr-2 rounded-lg text-xs font-medium text-center text-white bg-red-500 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800"
-              onClick={() => handleDeleteFAQ(row.original.id)}
+              onClick={() => handleDeleteFAQ(row.original._id)}
             >
               Delete
             </button>
             <button
               className="p-2 mr-2 rounded-lg text-xs font-medium text-center text-white bg-blue-500 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-              onClick={() => handleDetail(row.original.id)}
+              onClick={() => handleDetail(row.original._id)}
             >
               Detail
             </button>
@@ -336,8 +336,8 @@ const TableJobs = (props: Props) => {
         // onSettled
         onError: (error: any) => {
           setLoading(false);
-          console.log("Create FAQ error:", error.response.status);
-          toast.error("Create FAQ failed");
+          console.log("Create New Job error:", error.response.status);
+          toast.error("Create New Job failed");
         },
         onSuccess: async () => {
           setLoading(false);
@@ -345,7 +345,7 @@ const TableJobs = (props: Props) => {
           setInputs([]);
           refetch();
           reset();
-          toast.success("Create FAQ success");
+          toast.success("Create New Job successfully");
         },
       }
     );
@@ -423,7 +423,7 @@ const TableJobs = (props: Props) => {
     setIsOpenDrawer(false);
   };
 
-  const handleDetail = async (jobId: number) => {
+  const handleDetail = async (jobId: string) => {
     await setJobId(jobId);
     await jobDetailQuery.refetch();
     if (jobDetailQuery.isLoading) {
@@ -556,8 +556,8 @@ const TableJobs = (props: Props) => {
                   Educations
                 </div>
                 <ul className="list-disc pl-6 text-sm leading-6 text-gray-600">
-                  {(jobDetailQuery.data?.education || []).length > 0 ? (
-                    jobDetailQuery.data?.education.map((edu, index) => (
+                  {(jobDetailQuery.data?.degree || []).length > 0 ? (
+                    jobDetailQuery.data?.degree.map((edu, index) => (
                       <li key={index}>{edu}</li>
                     ))
                   ) : (
@@ -569,8 +569,8 @@ const TableJobs = (props: Props) => {
                   Experiences
                 </div>
                 <ul className="list-disc pl-6 text-sm leading-6 text-gray-600">
-                  {(jobDetailQuery.data?.experiment || []).length > 0 ? (
-                    jobDetailQuery.data?.experiment.map((edu, index) => (
+                  {(jobDetailQuery.data?.experience || []).length > 0 ? (
+                    jobDetailQuery.data?.experience.map((edu, index) => (
                       <li key={index}>{edu}</li>
                     ))
                   ) : (
@@ -582,8 +582,8 @@ const TableJobs = (props: Props) => {
                   Responsibilities
                 </div>
                 <ul className="list-disc pl-6 text-sm leading-6 text-gray-600">
-                  {(jobDetailQuery.data?.responsibilities || []).length > 0 ? (
-                    jobDetailQuery.data?.responsibilities.map((edu, index) => (
+                  {(jobDetailQuery.data?.responsibility || []).length > 0 ? (
+                    jobDetailQuery.data?.responsibility.map((edu, index) => (
                       <li key={index}>{edu}</li>
                     ))
                   ) : (
@@ -595,9 +595,9 @@ const TableJobs = (props: Props) => {
                   Technicall Skills
                 </div>
                 <div className="px-2 max-w-[500px]">
-                  {(jobDetailQuery.data?.technical_skills || []).length > 0 ? (
+                  {(jobDetailQuery.data?.technical_skill || []).length > 0 ? (
                     <div className="flex flex-wrap">
-                      {jobDetailQuery.data?.technical_skills.map(
+                      {jobDetailQuery.data?.technical_skill.map(
                         (edu, index) => (
                           <span
                             className="rounded-full bg-blue-500 text-white px-2 py-1 m-1"
@@ -617,8 +617,8 @@ const TableJobs = (props: Props) => {
                   Soft Skills
                 </div>
                 <ul className="list-disc pl-6 text-sm leading-6 text-gray-600">
-                  {(jobDetailQuery.data?.soft_skills || []).length > 0 ? (
-                    jobDetailQuery.data?.soft_skills.map((edu, index) => (
+                  {(jobDetailQuery.data?.soft_skill || []).length > 0 ? (
+                    jobDetailQuery.data?.soft_skill.map((edu, index) => (
                       <li key={index}>{edu}</li>
                     ))
                   ) : (
@@ -630,8 +630,8 @@ const TableJobs = (props: Props) => {
                   Certificates
                 </div>
                 <ul className="list-disc pl-6 text-sm leading-6 text-gray-600">
-                  {(jobDetailQuery.data?.certification || []).length > 0 ? (
-                    jobDetailQuery.data?.certification.map((edu, index) => (
+                  {(jobDetailQuery.data?.certificate || []).length > 0 ? (
+                    jobDetailQuery.data?.certificate.map((edu, index) => (
                       <li key={index}>{edu}</li>
                     ))
                   ) : (

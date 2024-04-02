@@ -3,11 +3,9 @@ import os
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
-CV_UPLOAD_DIR = "./cv_upload/"
-CV_ANALYSIS_DIR = "./cv_analysis/"
-JOB_ANALYSIS_DIR = "./job_analysis/"
-MATCHING_ANALYSIS_DIR = "./matching_analysis/"
+
 GPT_MODEL = "gpt-3.5-turbo-0613"
+ANALYSIS_SERVICE_URL = os.environ.get("ANALYSIS_SERVICE_URL")
 
 
 class DefaultConfig:
@@ -17,18 +15,13 @@ class DefaultConfig:
 
     # Flask Configuration
     APP_NAME = os.environ.get("APP_NAME")
-    SECRET_KEY = os.environ.get(
-        "SECRET_KEY", "e42ebf32a22c7cef7f4a33c71f90f0d8ea65e63144f952e57e1b39b26cc26a6f"
-    )
+    SECRET_KEY = os.environ.get("SECRET_KEY")
     PROPAGATE_EXCEPTIONS = True
     DEBUG = False
     TESTING = False
 
     # Configuration of Flask-JWT-Extended
-    JWT_SECRET_KEY = os.environ.get(
-        "JWT_SECRET_KEY",
-        "d7da6e940725de5a15b7e48f5a71f535a315c72a5372c1d3bb8691b38b5f29a1",
-    )
+    JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY")
     # Determines the minutes that the access token remains active
     JWT_ACCESS_TOKEN_EXPIRES = datetime.timedelta(minutes=30)
     # Determines the days that the refresh token remains active
@@ -78,6 +71,8 @@ class DevelopConfig(DefaultConfig):
     # Database configuration
     SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL")
 
+    MONGO_URI = os.environ.get("MONGO_URL")
+
 
 class TestingConfig(DefaultConfig):
     # App environment
@@ -98,6 +93,8 @@ class TestingConfig(DefaultConfig):
     # Database configuration
     SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_TEST_URL")
 
+    MONGO_URI = os.environ.get("MONGO_TEST_URL")
+
 
 class LocalConfig(DefaultConfig):
     # App environment
@@ -109,6 +106,8 @@ class LocalConfig(DefaultConfig):
     # Database configuration
     SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL")
 
+    MONGO_URI = os.environ.get("MONGO_URL")
+
 
 class ProductionConfig(DefaultConfig):
     # App environment
@@ -119,3 +118,5 @@ class ProductionConfig(DefaultConfig):
 
     # Database configuration
     SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL")
+
+    MONGO_URI = os.environ.get("MONGO_URL")

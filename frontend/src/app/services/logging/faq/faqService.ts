@@ -28,8 +28,8 @@ export const getMatchingCandidate = async (jobName: string) => {
   return data;
 };
 
-export const getJobDetailAxios = async (jobId: number) => {
-  const { data } = await useAxios.get(`/job-detail/${jobId}`, {
+export const getJobDetailAxios = async (jobId: string) => {
+  const { data } = await useAxios.get(`/job/${jobId}`, {
     headers: {
       "Content-Type": "application/json",
     },

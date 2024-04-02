@@ -1,57 +1,34 @@
 from marshmallow import Schema, ValidationError, fields, validates_schema
 
 
-class UploadFileSchema(Schema):
-    file_upload = fields.Field(required=True)
-
-    @validates_schema
-    def validate_pdf_or_doc_file(self, data, **kwargs):
-        file_upload = data["file_upload"]
-        if not (
-            file_upload.filename.endswith(".pdf")
-            or file_upload.filename.endswith(".docx")
-            or file_upload.filename.endswith(".PDF")
-            or file_upload.filename.endswith(".DOCX")
-        ):
-            raise ValidationError("File must be a PDF or DOCX")
-
-
-class PlainCandidateSchema(Schema):
-    id = fields.Int(dump_only=True)
-    candidate_name = fields.Str()
-    candidate_phone = fields.Str()
-    candidate_email = fields.Str()
-    candidate_summary = fields.Str()
-    recommended_jobs = fields.Str()
-    cv_name = fields.Str()
-    cv_hash = fields.Str()
-    cv_type = fields.Str()
-    cv_size = fields.Int()
-    cv_date = fields.Str(dump_only=True)
-
-
-class CandidateDetailSchema(Schema):
-    id = fields.Int(dump_only=True)
-    candidate_name = fields.Str()
-    candidate_phone = fields.Str()
-    candidate_email = fields.Str()
-    candidate_summary = fields.Str()
-    recommended_jobs = fields.Str()
-    cv_name = fields.Str()
-    cv_hash = fields.Str()
-    cv_type = fields.Str()
-    cv_size = fields.Int()
-    education = fields.List(fields.Str())
-    certification = fields.List(fields.Str())
-    experiment = fields.List(fields.Str())
-    responsibilities = fields.List(fields.Str())
-    soft_skills = fields.List(fields.Str())
-    technical_skills = fields.List(fields.Str())
-    cv_date = fields.Str(dump_only=True)
+class UpdateCandidateSchema(Schema):
+    candidate_name = fields.Str(required=True)
+    phone_number = fields.Str(required=True)
+    email = fields.Str(required=True)
+    comment = fields.Str(required=True)
 
 
 class CandidateSchema(Schema):
-    results = fields.List(fields.Nested(PlainCandidateSchema()))
+    _id = fields.Str(dump_only=True)
+    candidate_name = fields.Str()
+    phone_number = fields.Str()
+    email = fields.Str()
+    comment = fields.Str()
+    certificate = fields.List(fields.Str())
+    degree = fields.List(fields.Str())
+    experience = fields.List(fields.Str())
+    technical_skill = fields.List(fields.Str())
+    responsibility = fields.List(fields.Str())
+    soft_skill = fields.List(fields.Str())
+    job_recommended = fields.List(fields.Str())
+    cv_name = fields.Str()
+    created_at = fields.Str()
+    sql = fields.Int()
+    office = fields.Int()
+
+
+class CandidatePageSchema(Schema):
+    results = fields.List(fields.Nested(CandidateSchema()))
     total_page = fields.Int()
     total_file = fields.Int()
 

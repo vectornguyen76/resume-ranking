@@ -1,0 +1,21 @@
+Job description
+Ideating and executing features computation for predictive models
+Apply mathematics, statistics, machine learning to solve business problems
+Develop measurable metrics to track and determine the performance and impact of the solutions
+Monitor and verify the performance of models
+Understand, and analyze requirements from business and stakeholders that help trigger immediate insights and actions
+Collaborate with engineering and product development teams
+Your skills and experience
+Qualifications:
+
+MS in Computer Science or related fields.
+Good mathematical and statistical background.
+At least 1 year of professional working experience in applying machine learning solutions to business problems.
+Experience with Python, Pyspark and SQL.
+Excellent problem-solving skills
+Great programming skills
+Additional Requirements:
+
+Experience with Big Data stacks such as Hadoop, Spark.
+Understanding of distributed computing principles is a plus
+Experience with applied statistics and optimization is a plus

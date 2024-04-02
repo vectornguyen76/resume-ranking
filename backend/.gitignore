@@ -6,11 +6,6 @@ __pycache__/
 # C extensions
 *.so
 
-cv_analysis
-job_analysis
-matching_analysis
-cv_upload
-
 # Distribution / packaging
 .Python
 upload/
@@ -101,7 +96,7 @@ celerybeat.pid
 
 # Environment variable
 .env
-# .env*
+.env.*.local
 
 # Environments
 .venv/

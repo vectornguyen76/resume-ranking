@@ -39,7 +39,7 @@ type FormModel = {
 };
 
 interface DataFormModel {
-  id?: number;
+  _id?: number;
   job_name: string;
   job_description: string;
 }
@@ -56,8 +56,8 @@ const TableFAQ = (props: Props) => {
   const [fetching, setIsFetching] = React.useState<boolean>(false);
   const [faqId, setFaqId] = React.useState<number>(-1);
   const [inputs, setInputs] = React.useState<InputItem[] | []>([]);
-  const [CandidateId, setCandidateId] = React.useState<number>(1);
-  const [selectedJobId, setSelectedJobId] = React.useState<number>(0);
+  const [CandidateId, setCandidateId] = React.useState<string>("id");
+  const [selectedJobId, setSelectedJobId] = React.useState<string>("id");
   const candidateDetailQuery = useMatchingDetailData(
     CandidateId,
     selectedJobId
@@ -111,7 +111,7 @@ const TableFAQ = (props: Props) => {
   }, []); // The empty dependency array ensures this effect runs only once when the component mounts
 
   // Handle item selection
-  const handleMenuItemClick = async (jobId: number, jobName: string) => {
+  const handleMenuItemClick = async (jobId: string, jobName: string) => {
     await setSelectedJobId(jobId);
     await setSelectedJobName(jobName);
 
@@ -139,7 +139,7 @@ const TableFAQ = (props: Props) => {
     setIsOpenDrawer(false);
   };
 
-  const handleDetail = async (candidateId: number, jobId: number) => {
+  const handleDetail = async (candidateId: string, jobId: string) => {
     await setCandidateId(candidateId);
     await setSelectedJobId(jobId);
 
@@ -277,7 +277,6 @@ const TableFAQ = (props: Props) => {
             <button
               className="p-2 text-xs font-medium text-center text-white bg-blue-500 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
               value={row.original.id}
-              // onClick={handleDetail(row.original.id, 1)}
               onClick={() => handleDetail(row.original.id, selectedJobId)}
             >
               Detail
@@ -323,7 +322,7 @@ const TableFAQ = (props: Props) => {
         {},
         {
           onError: (error: any) => {
-            // console.log('Create FAQ error:', error.response.status);
+            // console.log('Matching error:', error.response.status);
             setLoadingMatching(false);
             toast.error("Process Matching Candidate failed");
           },
@@ -390,15 +389,15 @@ const TableFAQ = (props: Props) => {
       {},
       {
         onError: (error: any) => {
-          console.log("Create FAQ error:", error.response.status);
-          toast.error("Create FAQ failed");
+          console.log("Matching error:", error.response.status);
+          toast.error("Matching failed");
         },
         onSuccess: async () => {
           setIsOpenModalAdd(false);
           setInputs([]);
           refetch();
           reset();
-          toast.success("Create FAQ success");
+          toast.success("Matching successfully");
         },
       }
     );
@@ -536,12 +535,12 @@ const TableFAQ = (props: Props) => {
             <Menu.Items className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
               <div className="py-1">
                 {detailAllJobData?.map((item) => (
-                  <Menu.Item key={item.id}>
+                  <Menu.Item key={item._id}>
                     {({ active }) => (
                       <a
                         href="#"
                         onClick={() =>
-                          handleMenuItemClick(item.id, item.job_name)
+                          handleMenuItemClick(item._id, item.job_name)
                         } // Handle item click
                         className={classNames(
                           active
@@ -752,8 +751,8 @@ const TableFAQ = (props: Props) => {
                   Candidate Phone Number
                 </div>
                 <p className="text-sm leading-6 text-gray-60">
-                  {candidateDetailQuery.data?.candidate_phone
-                    ? candidateDetailQuery.data?.candidate_phone
+                  {candidateDetailQuery.data?.phone_number
+                    ? candidateDetailQuery.data?.phone_number
                     : "None"}
                 </p>
               </div>
@@ -797,8 +796,8 @@ const TableFAQ = (props: Props) => {
                   Summary Analyse Candidate
                 </div>
                 <p className="text-sm leading-6 text-gray-60">
-                  {candidateDetailQuery.data?.comment
-                    ? candidateDetailQuery.data?.comment
+                  {candidateDetailQuery.data?.summary_comment
+                    ? candidateDetailQuery.data?.summary_comment
                     : "None"}
                 </p>
               </div>
@@ -808,8 +807,8 @@ const TableFAQ = (props: Props) => {
                   Recommended Jobs
                 </div>
                 <p className="text-sm leading-6 text-gray-60">
-                  {candidateDetailQuery.data?.recommended_jobs
-                    ? candidateDetailQuery.data?.recommended_jobs
+                  {candidateDetailQuery.data?.job_recommended
+                    ? candidateDetailQuery.data?.job_recommended
                     : "None"}
                 </p>
               </div>
@@ -820,14 +819,14 @@ const TableFAQ = (props: Props) => {
                 </div>
                 <p className="px-2 text-sm leading-6 text-gray-60">
                   Comment:{" "}
-                  {candidateDetailQuery.data?.education_comment
-                    ? candidateDetailQuery.data?.education_comment
+                  {candidateDetailQuery.data?.degree.comment
+                    ? candidateDetailQuery.data?.degree.comment
                     : "None"}
                 </p>
                 <p className="px-2 text-sm leading-6 text-gray-60">
                   Score:{" "}
-                  {candidateDetailQuery.data?.education_score
-                    ? candidateDetailQuery.data?.education_score
+                  {candidateDetailQuery.data?.degree.score
+                    ? candidateDetailQuery.data?.degree.score
                     : "None"}
                 </p>
               </div>
@@ -838,14 +837,14 @@ const TableFAQ = (props: Props) => {
                 </div>
                 <p className="px-2 text-sm leading-6 text-gray-60">
                   Comment:{" "}
-                  {candidateDetailQuery.data?.experiment_comment
-                    ? candidateDetailQuery.data?.experiment_comment
+                  {candidateDetailQuery.data?.experience.comment
+                    ? candidateDetailQuery.data?.experience.comment
                     : "None"}
                 </p>
                 <p className="px-2 text-sm leading-6 text-gray-60">
                   Score:{" "}
-                  {candidateDetailQuery.data?.experiment_score
-                    ? candidateDetailQuery.data?.experiment_score
+                  {candidateDetailQuery.data?.experience.score
+                    ? candidateDetailQuery.data?.experience.score
                     : "None"}
                 </p>
               </div>
@@ -856,14 +855,14 @@ const TableFAQ = (props: Props) => {
                 </div>
                 <p className="px-2 text-sm leading-6 text-gray-60">
                   Comment:{" "}
-                  {candidateDetailQuery.data?.responsibilities_comment
-                    ? candidateDetailQuery.data?.responsibilities_comment
+                  {candidateDetailQuery.data?.responsibility.comment
+                    ? candidateDetailQuery.data?.responsibility.comment
                     : "None"}
                 </p>
                 <p className="px-2 text-sm leading-6 text-gray-60">
                   Score:{" "}
-                  {candidateDetailQuery.data?.responsibilities_score
-                    ? candidateDetailQuery.data?.responsibilities_score
+                  {candidateDetailQuery.data?.responsibility.score
+                    ? candidateDetailQuery.data?.responsibility.score
                     : "None"}
                 </p>
               </div>
@@ -874,14 +873,14 @@ const TableFAQ = (props: Props) => {
                 </div>
                 <p className="px-2 text-sm leading-6 text-gray-60">
                   Comment:{" "}
-                  {candidateDetailQuery.data?.technical_skills_comment
-                    ? candidateDetailQuery.data?.technical_skills_comment
+                  {candidateDetailQuery.data?.technical_skill.comment
+                    ? candidateDetailQuery.data?.technical_skill.comment
                     : "None"}
                 </p>
                 <p className="px-2 text-sm leading-6 text-gray-60">
                   Score:{" "}
-                  {candidateDetailQuery.data?.technical_skills_score
-                    ? candidateDetailQuery.data?.technical_skills_score
+                  {candidateDetailQuery.data?.technical_skill.score
+                    ? candidateDetailQuery.data?.technical_skill.score
                     : "None"}
                 </p>
               </div>
@@ -892,14 +891,14 @@ const TableFAQ = (props: Props) => {
                 </div>
                 <p className="px-2 text-sm leading-6 text-gray-60">
                   Comment:{" "}
-                  {candidateDetailQuery.data?.soft_skills_comment
-                    ? candidateDetailQuery.data?.soft_skills_comment
+                  {candidateDetailQuery.data?.soft_skill.comment
+                    ? candidateDetailQuery.data?.soft_skill.comment
                     : "None"}
                 </p>
                 <p className="px-2 text-sm leading-6 text-gray-60">
                   Score:{" "}
-                  {candidateDetailQuery.data?.soft_skills_score
-                    ? candidateDetailQuery.data?.soft_skills_score
+                  {candidateDetailQuery.data?.soft_skill.score
+                    ? candidateDetailQuery.data?.soft_skill.score
                     : "None"}
                 </p>
               </div>
@@ -910,14 +909,14 @@ const TableFAQ = (props: Props) => {
                 </div>
                 <p className="px-2 text-sm leading-6 text-gray-60">
                   Comment:{" "}
-                  {candidateDetailQuery.data?.certification_comment
-                    ? candidateDetailQuery.data?.certification_comment
+                  {candidateDetailQuery.data?.certificate.comment
+                    ? candidateDetailQuery.data?.certificate.comment
                     : "None"}
                 </p>
                 <p className="px-2 text-sm leading-6 text-gray-60">
                   Score:{" "}
-                  {candidateDetailQuery.data?.certification_score
-                    ? candidateDetailQuery.data?.certification_score
+                  {candidateDetailQuery.data?.certificate.score
+                    ? candidateDetailQuery.data?.certificate.score
                     : "None"}
                 </p>
               </div>

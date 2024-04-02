@@ -6,15 +6,6 @@ from flask_smorest import Blueprint
 blp = Blueprint("Job", __name__, description="Job API")
 
 
-@blp.route("/job-page")
-class JobPageList(MethodView):
-    @blp.arguments(JobFilterPageSchema)
-    @blp.response(200, JobPageSchema)
-    def post(self, job_data):
-        result = job_service.get_job_page(job_data)
-        return result
-
-
 @blp.route("/job")
 class JobList(MethodView):
     @blp.response(200, PlainJobSchema(many=True))
@@ -23,12 +14,22 @@ class JobList(MethodView):
         return result
 
     @blp.arguments(CreateUpdateJobSchema)
+    @blp.response(200, PlainJobSchema())
     def post(self, job_data):
         result = job_service.post_job(job_data)
         return result
 
 
-@blp.route("/job/<int:job_id>")
+@blp.route("/job-page")
+class JobPageList(MethodView):
+    @blp.arguments(JobFilterPageSchema)
+    @blp.response(200, JobPageSchema)
+    def post(self, job_data):
+        result = job_service.get_list_job(job_data)
+        return result
+
+
+@blp.route("/job/<string:job_id>")
 class JobQnA(MethodView):
     @blp.response(200, PlainJobSchema)
     def get(self, job_id):
@@ -42,12 +43,4 @@ class JobQnA(MethodView):
 
     def delete(self, job_id):
         result = job_service.delete_job(job_id)
-        return result
-
-
-@blp.route("/job-detail/<int:job_id>")
-class Candidate(MethodView):
-    @blp.response(200, JobDetailSchema)
-    def get(self, job_id):
-        result = job_service.get_job_detail(job_id)
         return result

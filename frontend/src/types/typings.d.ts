@@ -61,73 +61,67 @@ interface UserModel {
 }
 
 interface CandidateDetailModel {
-  id: number;
+  _id: string;
   candidate_name: string;
-  candidate_phone: string;
-  candidate_email: string;
-  candidate_summary: string;
-  recommended_jobs: string;
+  phone_number: string;
+  email: string;
+  comment: string;
+  job_recommended: string[];
   cv_name: string;
-  cv_hash: string;
-  cv_type: string;
-  cv_size: number;
-  cv_date: any;
-  education: string[];
-  experiment: string[];
-  responsibilities: string[];
-  soft_skills: string[];
-  technical_skills: string[];
-  certification: string[];
+  created_at: any;
+  degree: string[];
+  experience: string[];
+  responsibility: string[];
+  soft_skill: string[];
+  technical_skill: string[];
+  certificate: string[];
 }
 
 interface JobDetailModel {
-  id: number;
+  _id: string;
   job_name: string;
   created_at: any;
-  education: string[];
-  experiment: string[];
-  responsibilities: string[];
-  soft_skills: string[];
-  technical_skills: string[];
-  certification: string[];
+  degree: string[];
+  experience: string[];
+  responsibility: string[];
+  soft_skill: string[];
+  technical_skill: string[];
+  certificate: string[];
 }
 
 interface MatchingDetailModel {
-  id: number;
+  _id: string;
   candidate_name: string;
-  candidate_email: string;
-  candidate_phone: string;
-  recommended_jobs: string;
+  email: string;
+  phone_number: string;
+  job_recommended: string;
   cv_name: string;
   job_name: string;
   score: string;
-  comment: string;
-  education_comment: string[];
-  education_score: string[];
-  experiment_comment: string[];
-  experiment_score: string[];
-  responsibilities_comment: string[];
-  responsibilities_score: string[];
-  soft_skills_comment: string[];
-  soft_skills_score: string[];
-  technical_skills_comment: string[];
-  technical_skills_score: string[];
-  certification_comment: string[];
-  certification_score: string[];
+  summary_comment: string;
+  degree: { score: number; comment: string };
+  experience: { score: number; comment: string };
+  responsibility: { score: number; comment: string };
+  soft_skill: { score: number; comment: string };
+  technical_skill: { score: number; comment: string };
+  certificate: { score: number; comment: string };
 }
 
 interface CandidateModel {
-  id: number;
+  _id: string;
   candidate_name: string;
-  candidate_phone: string;
-  candidate_email: string;
-  candidate_summary: string;
-  recommended_jobs: string;
+  phone_number: string;
+  email: string;
+  comment: string;
+  job_recommended: string;
   cv_name: string;
-  cv_hash: string;
-  cv_type: string;
-  cv_size: number;
-  cv_date: any;
+  created_at: any;
+  degree: string[];
+  experience: string[];
+  responsibility: string[];
+  soft_skill: string[];
+  technical_skill: string[];
+  certificate: string[];
 }
 
 interface CandidateResponseModel {
@@ -181,7 +175,7 @@ interface FAQModel {
 }
 
 interface JobModel {
-  id: number;
+  _id: string;
   job_name: string;
   job_description: string;
   created_at: string;
@@ -194,7 +188,7 @@ interface FAQResponeModel {
 }
 
 interface JobMatchingModel {
-  id: number;
+  id: string;
   candidate_name: string;
   candidate_email: string;
   candidate_phone: string;

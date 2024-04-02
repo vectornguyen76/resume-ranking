@@ -46,7 +46,7 @@ export function useAllJobData(): UseQueryResult<JobModel[], unknown> {
 }
 
 export function useJobDetailData(
-  jobId: number
+  jobId: string
 ): UseQueryResult<JobDetailModel> {
   return useQuery(["list-job-detail"], () => getJobDetailAxios(jobId), {
     enabled: false,

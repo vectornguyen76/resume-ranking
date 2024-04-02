@@ -1,93 +1,95 @@
 import json
 import logging
 import os
-from datetime import datetime
 from math import ceil
 
 import config
-from analysis_service.main import DocumentAnalyzer
-from app.db import db
-from app.models.candidate_model import CandidateModel
-from app.models.job_model import JobModel
-from app.models.matching_model import MatchingModel
+import requests
+from app.db import mongo
+from bson.objectid import ObjectId
 from flask_smorest import abort
-from pytz import timezone
-from sqlalchemy import asc, desc
 
 # Create logger for this module
 logger = logging.getLogger(__name__)
 
 
-def json_filename(file_name):
-    """abc.pdf >>> abc.json"""
-    base_name, file_extension = os.path.splitext(file_name)
-    json_filename = base_name + ".json"
-    return json_filename
+# Helper function to serialize MongoDB ObjectId
+def serialize_doc(doc):
+    doc["_id"] = str(doc["_id"])
+    return doc
 
 
-def json2string(path):
-    with open(path) as f:
-        data = json.load(f)
-    return data
+def get_all_matching():
+    result = mongo.db.matching.find()
+    return result
 
 
 def process_matching(matching_data):
     job_name = matching_data["job_name"]
-
-    job = JobModel.query.filter_by(job_name=job_name).first()
-
-    if not job:
-        abort(400, message="job not found!")
-
-    analyzer = DocumentAnalyzer()
+    job = mongo.db.job.find_one_or_404({"job_name": job_name})
 
     # Get all candidate
-    candidates = CandidateModel.query.order_by(asc(CandidateModel.id)).all()
+    candidates = mongo.db.candidate.find()
 
     # Loop matching to caculate score for each candidate
     for candidate in candidates:
         # Check exist analyse
-        matching_records = MatchingModel.query.filter_by(
-            candidate_id=candidate.id, job_id=job.id
-        ).first()
-        if matching_records:
+        matching_exist = mongo.db.matching.find_one(
+            {"job_id": job["_id"], "candidate_id": candidate["_id"]}
+        )
+
+        if matching_exist:
+            logger.info(
+                f"Matching exist candidate & job: {candidate['candidate_name']} - {job['job_name']}"
+            )
             continue
 
-        cv_file_name = analyzer.json_filename(candidate.cv_name_analyse)
-        job_file_name = job_name + ".json"
+        matching_analyse = {
+            "candidate": serialize_doc(candidate),
+            "job": serialize_doc(job),
+        }
 
-        result = analyzer.analyse_matching(cv_file_name, job_file_name)
+        logger.info(
+            f"Matching candidate & job: {candidate['candidate_name']} - {job['job_name']}"
+        )
 
-        # Get score return and save to database
+        analysis_endpoint_url = f"{config.ANALYSIS_SERVICE_URL}/matching/analyse"
+        response = requests.post(analysis_endpoint_url, json=matching_analyse)
+
+        # Check response status and return appropriate response
+        if response.status_code != 200:
+            abort(400, message=f"Fail to analyse matching!")
+
+        # Get the content of the response
+        response_content = response.json()
+
+        response_content["job_id"] = ObjectId(job["_id"])
+        response_content["candidate_id"] = ObjectId(candidate["_id"])
+
+        # Add to database
         try:
-            matching = MatchingModel(
-                job_id=job.id,
-                candidate_id=candidate.id,
-                score=str(int(result["score"])),
-                comment=result["comment"],
-            )
-            db.session.add(matching)
-            db.session.commit()
+            collection = mongo.db.matching
+            result = collection.insert_one(response_content)
+
+            logger.info(f"id matching {result.inserted_id}")
+
         except:
-            db.session.rollback()
-            abort(400, message="Can not add Matching!")
+            logger.error("Upload document to Database failed!")
+            abort(400, message="Upload document to Database failed!")
 
     return {"message": "Analyse matching successfully!"}
 
 
-def filter_candidate_matching(matching_data):
+def filter_matching_data(matching_data):
     job_name = matching_data["job_name"]
 
     # Query the JobModel to get the job_id based on the job_name
-    job = JobModel.query.filter_by(job_name=job_name).first()
+    job_exist = mongo.db.job.find_one({"job_name": job_name})
 
-    job_id = job.id if job is not None else -1
-
-    results = CandidateModel.query.order_by(asc(CandidateModel.id))
+    job_id = job_exist["_id"] if job_exist is not None else "id"
 
     # Filter
     results = filter_page(
-        results,
         page_size=matching_data["page_size"],
         page=matching_data["page"],
         job_id=job_id,
@@ -101,47 +103,60 @@ def filter_candidate_matching(matching_data):
     return results
 
 
-def filter_page(results, page_size, page, job_id):
+def filter_page(page_size, page, job_id):
     if page_size == None:
         page_size = 10
 
     if page == None:
         page = 1
-
     else:
         page = page - 1
 
-    total_matching = results.count()
-    total_page = ceil(total_matching / page_size)
+    # Connect to MongoDB and get the collection
+    collection_candidate = mongo.db.candidate
 
+    # Count total documents in the collection
+    total_file = collection_candidate.count_documents({})
+
+    # Calculate total pages
+    total_page = ceil(total_file / page_size)
+
+    # Validate page and page_size
     if page < 0 or page_size < 0:
-        abort(400, message="Number page or page size is wrong!")
+        abort(400, message="Page number or page size is invalid.")
 
     # Create an empty list to store the modified candidates with scores.
     modified_results = []
 
-    for candidate in results:
-        matching_records = MatchingModel.query.filter_by(
-            candidate_id=candidate.id, job_id=job_id
-        ).first()
-        if matching_records is not None:
-            score = matching_records.score
-            comment = matching_records.comment
+    for candidate in collection_candidate.find():
+        matching = mongo.db.matching.find_one(
+            {"job_id": job_id, "candidate_id": candidate["_id"]}
+        )
+
+        # print("job_id", job_id)
+        # print("candidate_id", candidate["_id"])
+        # print("job_id", type(job_id))
+        # print("candidate_id", type(candidate["_id"]))
+        # print(f"matching {matching}")
+
+        if matching is not None:
+            score = matching["score"]
+            summary_comment = matching["summary_comment"]
             matching_status = True
         else:
             score = 0
-            comment = ""
+            summary_comment = ""
             matching_status = False
 
         modified_results.append(
             {
-                "id": candidate.id,
-                "candidate_name": candidate.candidate_name,
-                "candidate_email": candidate.candidate_email,
-                "candidate_phone": candidate.candidate_phone,
-                "cv_name": candidate.cv_name,
+                "id": candidate["_id"],
+                "candidate_name": candidate["candidate_name"],
+                "candidate_email": candidate["email"],
+                "candidate_phone": candidate["phone_number"],
+                "cv_name": candidate["cv_name"],
                 "score": score,
-                "comment": comment,
+                "summary_comment": summary_comment,
                 "matching_status": matching_status,
             }
         )
@@ -158,48 +173,22 @@ def filter_page(results, page_size, page, job_id):
     return {
         "results": paginated_results,
         "total_page": total_page,
-        "total_matching": total_matching,
+        "total_matching": total_file,
     }
 
 
 def get_matching_data(candidate_id, job_id):
-    candidate = CandidateModel.query.filter_by(id=candidate_id).first()
-    matching = MatchingModel.query.filter_by(
-        candidate_id=candidate_id, job_id=job_id
-    ).first()
+    matching = mongo.db.matching.find_one(
+        {"job_id": ObjectId(job_id), "candidate_id": ObjectId(candidate_id)}
+    )
+
+    candidate = mongo.db.candidate.find_one({"_id": ObjectId(candidate_id)})
 
     if not matching:
         return candidate
 
-    matching.candidate_name = candidate.candidate_name
-    matching.candidate_phone = candidate.candidate_phone
-    matching.cv_name = candidate.cv_name
-    matching.recommended_jobs = candidate.recommended_jobs
-    job = JobModel.query.filter_by(id=job_id).first()
+    job = mongo.db.job.find_one({"_id": ObjectId(job_id)})
 
-    # Read file analysis matching
-    base_cv_name, _ = os.path.splitext(candidate.cv_name_analyse)
-    path_file = config.MATCHING_ANALYSIS_DIR + f"{job.job_name}-{base_cv_name}.json"
-    data_matching = json2string(path=path_file)
-
-    matching.job_name = job.job_name
-
-    matching.education_comment = data_matching["Degree"]["comments"]
-    matching.education_score = data_matching["Degree"]["score"]
-
-    matching.experiment_comment = data_matching["Experience"]["comments"]
-    matching.experiment_score = data_matching["Experience"]["score"]
-
-    matching.responsibilities_comment = data_matching["Responsibilities"]["comments"]
-    matching.responsibilities_score = data_matching["Responsibilities"]["score"]
-
-    matching.certification_comment = data_matching["Certificates"]["comments"]
-    matching.certification_score = data_matching["Certificates"]["score"]
-
-    matching.soft_skills_comment = data_matching["SoftSkills"]["comments"]
-    matching.soft_skills_score = data_matching["SoftSkills"]["score"]
-
-    matching.technical_skills_comment = data_matching["TechnicalSkills"]["comments"]
-    matching.technical_skills_score = data_matching["TechnicalSkills"]["score"]
+    matching["job_name"] = job["job_name"]
 
     return matching

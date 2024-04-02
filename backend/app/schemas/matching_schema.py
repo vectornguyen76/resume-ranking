@@ -1,8 +1,27 @@
 from marshmallow import Schema, fields
 
 
-class MatchingSchema(Schema):
+class ProcessMatchingSchema(Schema):
     job_name = fields.Str(required=True)
+
+
+class AnalyseSchema(Schema):
+    comment = fields.Str()
+    score = fields.Int()
+
+
+class MatchingSchema(Schema):
+    _id = fields.Str()
+    candidate_id = fields.Str()
+    job_id = fields.Str()
+    degree = fields.Nested(AnalyseSchema())
+    experience = fields.Nested(AnalyseSchema())
+    responsibility = fields.Nested(AnalyseSchema())
+    soft_skill = fields.Nested(AnalyseSchema())
+    technical_skill = fields.Nested(AnalyseSchema())
+    certificate = fields.Nested(AnalyseSchema())
+    summary_comment = fields.Str()
+    score = fields.Float()
 
 
 class MatchingFilterPageSchema(Schema):
@@ -12,13 +31,13 @@ class MatchingFilterPageSchema(Schema):
 
 
 class PlainMatchingSchema(Schema):
-    id = fields.Int(dump_only=True)
+    id = fields.Str(dump_only=True)
     candidate_name = fields.Str(required=True)
     candidate_email = fields.Str(required=True)
     candidate_email = fields.Str(required=True)
     cv_name = fields.Str(required=True)
     score = fields.Str(required=True)
-    comment = fields.Str(required=True)
+    summary_comment = fields.Str(required=True)
     matching_status = fields.Bool(required=True)
 
 
@@ -29,23 +48,18 @@ class MatchingPageSchema(Schema):
 
 
 class MatchingDetailSchema(Schema):
-    id = fields.Int(dump_only=True)
-    candidate_name = fields.Str(required=True)
-    candidate_phone = fields.Str(required=True)
-    cv_name = fields.Str(required=True)
-    job_name = fields.Str(required=True)
-    score = fields.Str(required=True)
-    comment = fields.Str(required=True)
-    recommended_jobs = fields.Str(required=True)
-    education_comment = fields.Str(required=True)
-    education_score = fields.Str(required=True)
-    experiment_comment = fields.Str(required=True)
-    experiment_score = fields.Str(required=True)
-    responsibilities_comment = fields.Str(required=True)
-    responsibilities_score = fields.Str(required=True)
-    certification_comment = fields.Str(required=True)
-    certification_score = fields.Str(required=True)
-    soft_skills_comment = fields.Str(required=True)
-    soft_skills_score = fields.Str(required=True)
-    technical_skills_comment = fields.Str(required=True)
-    technical_skills_score = fields.Str(required=True)
+    _id = fields.Str()
+    candidate_name = fields.Str()
+    phone_number = fields.Str()
+    email = fields.Str()
+    cv_name = fields.Str()
+    job_recommended = fields.List(fields.Str())
+    job_name = fields.Str()
+    score = fields.Str()
+    summary_comment = fields.Str()
+    degree = fields.Nested(AnalyseSchema())
+    experience = fields.Nested(AnalyseSchema())
+    responsibility = fields.Nested(AnalyseSchema())
+    soft_skill = fields.Nested(AnalyseSchema())
+    technical_skill = fields.Nested(AnalyseSchema())
+    certificate = fields.Nested(AnalyseSchema())

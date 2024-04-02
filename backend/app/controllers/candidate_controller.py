@@ -16,17 +16,22 @@ class UploadCV(MethodView):
 @blp.route("/list-candidate")
 class ListCandidate(MethodView):
     @blp.arguments(CandidateFilterSchema)
-    @blp.response(200, CandidateSchema)
+    @blp.response(200, CandidatePageSchema)
     def post(self, candidate_data):
         result = candidate_service.get_list_candidate(candidate_data)
         return result
 
 
-@blp.route("/candidate/<int:candidate_id>")
+@blp.route("/candidate/<string:candidate_id>")
 class Candidate(MethodView):
-    @blp.response(200, CandidateDetailSchema)
+    @blp.response(200, CandidateSchema)
     def get(self, candidate_id):
         result = candidate_service.get_candiate(candidate_id)
+        return result
+
+    @blp.arguments(UpdateCandidateSchema)
+    def put(self, candidate_data, candidate_id):
+        result = candidate_service.update_candidate(candidate_data, candidate_id)
         return result
 
     def delete(self, candidate_id):

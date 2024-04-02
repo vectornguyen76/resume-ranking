@@ -32,7 +32,7 @@ export function useUploadFileData(files: File[]): UseMutationResult<any> {
 }
 
 export function useListFileDetailData(
-  fileId: number
+  fileId: string
 ): UseQueryResult<CandidateDetailModel> {
   return useQuery(
     ["list-candidate-detail"],
@@ -42,8 +42,8 @@ export function useListFileDetailData(
 }
 
 export function useMatchingDetailData(
-  candidateId: number,
-  jobId: number
+  candidateId: string,
+  jobId: string
 ): UseQueryResult<MatchingDetailModel> {
   return useQuery(
     ["matching-detail"],
@@ -52,6 +52,6 @@ export function useMatchingDetailData(
   );
 }
 
-export function useDeleteFileData(fileId: number): UseMutationResult<any> {
+export function useDeleteFileData(fileId: string): UseMutationResult<any> {
   return useMutation(["files-delete"], () => deleteFileAxios(fileId));
 }

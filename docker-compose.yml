@@ -1,5 +1,17 @@
 version: "3"
 services:
+  analysis_service:
+    container_name: analysis_service
+    image: vectornguyen76/resume_ranking_analysis
+    build:
+      context: ./analysis_service
+      dockerfile: Dockerfile
+    env_file:
+      - ./analysis_service/.env
+    volumes:
+      - ./analysis_service/logs:/app/logs
+      - ./analysis_service/candidate_cv:/app/candidate_cv
+
   frontend_service:
     container_name: frontend_container
     image: vectornguyen76/resume_ranking_frontend
@@ -7,8 +19,8 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     command: npm start
-    ports:
-      - 3000:3000
+    # ports:
+    #   - 3000:3000
 
   backend_service:
     container_name: backend
@@ -18,24 +30,22 @@ services:
       dockerfile: Dockerfile
     env_file:
       - ./backend/.env.api.local
-    ports:
-      - 5000:5000
+    # ports:
+    #   - 5000:5000
     restart: on-failure
     volumes:
       - ./backend/logs:/app/logs
-      - ./backend/matching_analysis:/app/matching_analysis
-      - ./backend/job_analysis:/app/job_analysis
-      - ./backend/cv_analysis:/app/cv_analysis
     depends_on:
-      - db_service
+      - mongo_db
 
-  db_service:
-    container_name: db_container
-    image: postgres:13.3
-    env_file:
-      - ./backend/.env.db.local
+  mongo_db:
+    container_name: mongo_db
+    image: mvertes/alpine-mongo:latest
     volumes:
-      - postgresql_data:/var/lib/postgresql/data/
+      - mongo_data:/data/db/
+    restart: always
+    ports:
+      - 27017:27017
 
   nginx_service:
     container_name: nginx_container
@@ -50,4 +60,4 @@ services:
       - frontend_service
 
 volumes:
-  postgresql_data:
+  mongo_data:

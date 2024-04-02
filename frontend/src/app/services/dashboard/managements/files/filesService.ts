@@ -11,7 +11,7 @@ export const getListFileAxios = async (
   return data;
 };
 
-export const getListFileDetailAxios = async (fileId: number) => {
+export const getListFileDetailAxios = async (fileId: string) => {
   const { data } = await useAxios.get(`/candidate/${fileId}`, {
     headers: {
       "Content-Type": "application/json",
@@ -21,8 +21,8 @@ export const getListFileDetailAxios = async (fileId: number) => {
 };
 
 export const getMatchingDetailAxios = async (
-  candidateId: number,
-  jobId: number
+  candidateId: string,
+  jobId: string
 ) => {
   const { data } = await useAxios.get(
     `/candidate/${candidateId}/job/${jobId}`,
@@ -44,7 +44,7 @@ export const uploadFileAxios = async (formData: FormData) => {
   return data;
 };
 
-export const deleteFileAxios = async (fileId: number) => {
+export const deleteFileAxios = async (fileId: string) => {
   const { data } = await useAxios.delete(`/candidate/${fileId}`, {
     headers: {
       "Content-Type": "application/json",

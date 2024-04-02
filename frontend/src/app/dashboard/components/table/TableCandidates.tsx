@@ -21,7 +21,7 @@ const TableCandidates = (props2: Props) => {
   const [pageSize, setPageSize] = React.useState<number>(10);
   const [isOpenDrawer, setIsOpenDrawer] = React.useState<boolean>(false);
   const [fetching, setIsFetching] = React.useState<boolean>(false);
-  const [fileId, setFileId] = React.useState<number>(0);
+  const [fileId, setFileId] = React.useState<string>("id");
   const [fileName, setFileName] = React.useState<string>("");
   const [isOpenModalDelete, setIsOpenModalDelete] =
     React.useState<boolean>(false);
@@ -59,9 +59,9 @@ const TableCandidates = (props2: Props) => {
     };
   }, []); // The empty dependency array ensures this effect runs only once when the component mounts
 
-  const showModalDelete = (fileId: number, fileName: string) => {
-    setFileId(fileId);
-    setFileName(fileName);
+  const showModalDelete = async (fileId: string, fileName: string) => {
+    await setFileId(fileId);
+    await setFileName(fileName);
     setIsOpenModalDelete(true);
   };
 
@@ -73,7 +73,7 @@ const TableCandidates = (props2: Props) => {
     deleteFile(
       {},
       {
-        onError: (error: any) => {
+        onError: async (error: any) => {
           console.log("Delete file error:", error.response.status);
           setIsOpenModalDelete(false);
           toast.error("Delete file failed");
@@ -107,11 +107,11 @@ const TableCandidates = (props2: Props) => {
       header: "Candidate Name",
       cell: (props) => props.getValue(),
     }),
-    columnHelper.accessor("candidate_email", {
+    columnHelper.accessor("email", {
       header: "Email Address",
       cell: (props) => props.getValue(),
     }),
-    columnHelper.accessor("candidate_phone", {
+    columnHelper.accessor("phone_number", {
       header: "Phone Number",
       cell: (props) => props.getValue(),
     }),
@@ -125,9 +125,21 @@ const TableCandidates = (props2: Props) => {
     //     return <div className="truncate">{props.getValue()}</div>;
     //   },
     // }),
-    columnHelper.accessor("recommended_jobs", {
+    columnHelper.accessor("job_recommended", {
       header: "Recommended Jobs",
-      cell: (props) => props.getValue(),
+      cell: (props: any) => {
+        const recommendedJobs = props.getValue();
+        return (
+          <div>
+            {recommendedJobs.map((job: any, index: any) => (
+              <span key={index}>
+                {job}
+                {index !== recommendedJobs.length - 1 ? ", " : ""}
+              </span>
+            ))}
+          </div>
+        );
+      },
     }),
     columnHelper.display({
       header: "Action",
@@ -136,16 +148,16 @@ const TableCandidates = (props2: Props) => {
           <>
             <button
               className="p-2 text-xs font-medium text-center text-white bg-blue-500 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-              value={row.original.id}
+              value={row.original._id}
               onClick={handleDetail}
             >
               Detail
             </button>
             <button
               className="p-2 ml-2 text-xs font-medium text-center text-white bg-red-500 rounded-lg hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800"
-              value={row.original.id}
+              value={row.original._id}
               onClick={() =>
-                showModalDelete(row.original.id, row.original.name)
+                showModalDelete(row.original._id, row.original.cv_name)
               }
             >
               Delete
@@ -230,8 +242,8 @@ const TableCandidates = (props2: Props) => {
                   Candidate Email Address
                 </div>
                 <p className="text-sm leading-6 text-gray-60">
-                  {fileDetailQuery.data?.candidate_email
-                    ? fileDetailQuery.data?.candidate_email
+                  {fileDetailQuery.data?.email
+                    ? fileDetailQuery.data?.email
                     : "None"}
                 </p>
 
@@ -239,8 +251,8 @@ const TableCandidates = (props2: Props) => {
                   Candidate Phone Number
                 </div>
                 <p className="text-sm leading-6 text-gray-60">
-                  {fileDetailQuery.data?.candidate_phone
-                    ? fileDetailQuery.data?.candidate_phone
+                  {fileDetailQuery.data?.phone_number
+                    ? fileDetailQuery.data?.phone_number
                     : "None"}
                 </p>
 
@@ -248,8 +260,8 @@ const TableCandidates = (props2: Props) => {
                   Candidate Summary
                 </div>
                 <p className="text-sm leading-6 text-gray-60">
-                  {fileDetailQuery.data?.candidate_summary
-                    ? fileDetailQuery.data?.candidate_summary
+                  {fileDetailQuery.data?.comment
+                    ? fileDetailQuery.data?.comment
                     : "None"}
                 </p>
 
@@ -257,8 +269,8 @@ const TableCandidates = (props2: Props) => {
                   Recommended Jobs
                 </div>
                 <p className="text-sm leading-6 text-gray-60">
-                  {fileDetailQuery.data?.recommended_jobs
-                    ? fileDetailQuery.data?.recommended_jobs
+                  {fileDetailQuery.data?.job_recommended
+                    ? fileDetailQuery.data?.job_recommended.join(", ")
                     : "None"}
                 </p>
 
@@ -266,8 +278,8 @@ const TableCandidates = (props2: Props) => {
                   Educations
                 </div>
                 <ul className="list-disc pl-6 text-sm leading-6 text-gray-600">
-                  {(fileDetailQuery.data?.education || []).length > 0 ? (
-                    fileDetailQuery.data?.education.map((edu, index) => (
+                  {(fileDetailQuery.data?.degree || []).length > 0 ? (
+                    fileDetailQuery.data?.degree.map((edu, index) => (
                       <li key={index}>{edu}</li>
                     ))
                   ) : (
@@ -279,8 +291,8 @@ const TableCandidates = (props2: Props) => {
                   Experiences
                 </div>
                 <ul className="list-disc pl-6 text-sm leading-6 text-gray-600">
-                  {(fileDetailQuery.data?.experiment || []).length > 0 ? (
-                    fileDetailQuery.data?.experiment.map((edu, index) => (
+                  {(fileDetailQuery.data?.experience || []).length > 0 ? (
+                    fileDetailQuery.data?.experience.map((edu, index) => (
                       <li key={index}>{edu}</li>
                     ))
                   ) : (
@@ -292,8 +304,8 @@ const TableCandidates = (props2: Props) => {
                   Responsibilities
                 </div>
                 <ul className="list-disc pl-6 text-sm leading-6 text-gray-600">
-                  {(fileDetailQuery.data?.responsibilities || []).length > 0 ? (
-                    fileDetailQuery.data?.responsibilities.map((edu, index) => (
+                  {(fileDetailQuery.data?.responsibility || []).length > 0 ? (
+                    fileDetailQuery.data?.responsibility.map((edu, index) => (
                       <li key={index}>{edu}</li>
                     ))
                   ) : (
@@ -305,9 +317,9 @@ const TableCandidates = (props2: Props) => {
                   Technicall Skills
                 </div>
                 <div className="px-2 max-w-[500px]">
-                  {(fileDetailQuery.data?.technical_skills || []).length > 0 ? (
+                  {(fileDetailQuery.data?.technical_skill || []).length > 0 ? (
                     <div className="flex flex-wrap">
-                      {fileDetailQuery.data?.technical_skills.map(
+                      {fileDetailQuery.data?.technical_skill.map(
                         (edu, index) => (
                           <span
                             className="rounded-full bg-blue-500 text-white px-2 py-1 m-1"
@@ -327,8 +339,8 @@ const TableCandidates = (props2: Props) => {
                   Soft Skills
                 </div>
                 <ul className="list-disc pl-6 text-sm leading-6 text-gray-600">
-                  {(fileDetailQuery.data?.soft_skills || []).length > 0 ? (
-                    fileDetailQuery.data?.soft_skills.map((edu, index) => (
+                  {(fileDetailQuery.data?.soft_skill || []).length > 0 ? (
+                    fileDetailQuery.data?.soft_skill.map((edu, index) => (
                       <li key={index}>{edu}</li>
                     ))
                   ) : (
@@ -340,8 +352,8 @@ const TableCandidates = (props2: Props) => {
                   Certificates
                 </div>
                 <ul className="list-disc pl-6 text-sm leading-6 text-gray-600">
-                  {(fileDetailQuery.data?.certification || []).length > 0 ? (
-                    fileDetailQuery.data?.certification.map((edu, index) => (
+                  {(fileDetailQuery.data?.certificate || []).length > 0 ? (
+                    fileDetailQuery.data?.certificate.map((edu, index) => (
                       <li key={index}>{edu}</li>
                     ))
                   ) : (
@@ -362,8 +374,8 @@ const TableCandidates = (props2: Props) => {
                   Candidate Created Date
                 </div>
                 <p className="text-sm leading-6 text-gray-60">
-                  {fileDetailQuery.data?.cv_date
-                    ? fileDetailQuery.data?.cv_date
+                  {fileDetailQuery.data?.created_at
+                    ? fileDetailQuery.data?.created_at
                     : "None"}
                 </p>
               </div>

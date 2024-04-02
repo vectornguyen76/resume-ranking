@@ -1,165 +1,125 @@
 import hashlib
-import json
 import logging
-import os
 import time
 from datetime import datetime
 from math import ceil
 
 import config
-from analysis_service.main import DocumentAnalyzer
-from app.db import db
-from app.models.candidate_model import CandidateModel
-from app.models.matching_model import MatchingModel
-from app.schemas.candidate_schema import UploadFileSchema
+import requests
+from app.db import mongo
+from bson.objectid import ObjectId
 from flask import request
 from flask_smorest import abort
 from pytz import timezone
-from sqlalchemy import asc
 
 # Create logger for this module
 logger = logging.getLogger(__name__)
 
 
-def json_filename(file_name):
-    """abc.pdf >>> abc.json"""
-    base_name, file_extension = os.path.splitext(file_name)
-    json_filename = base_name + ".json"
-    return json_filename
-
-
-def json2string(path):
-    with open(path) as f:
-        data = json.load(f)
-    return data
-
-
 def get_candiate(candiate_id):
-    results = CandidateModel.query.filter_by(id=candiate_id).first()
-
-    if not results:
-        abort(400, message="job not found!")
-
-    path_file = config.CV_ANALYSIS_DIR + json_filename(results.cv_name_analyse)
-    data_candidate = json2string(path=path_file)
-
-    results.education = data_candidate["Degree"]
-    results.experiment = data_candidate["Experience"]
-    results.responsibilities = data_candidate["Responsibilities"]
-    results.certification = data_candidate["Certificates"]
-    results.soft_skills = data_candidate["SoftSkills"]
-    results.technical_skills = data_candidate["TechnicalSkills"]
-
-    return results
+    collection = mongo.db.candidate
+    result = collection.find_one_or_404({"_id": ObjectId(candiate_id)})
+    return result
 
 
 def get_list_candidate(file_data):
-    results = CandidateModel.query.order_by(asc(CandidateModel.id))
-    try:
-        results = filter_page(
-            results, page_size=file_data["page_size"], page=file_data["page"]
-        )
-    except:
-        logger.error("Can not get list file!")
-        abort(400, message="Can not get list file!")
+    page_size = file_data["page_size"]
+    page = file_data["page"]
 
-    return results
-
-
-def filter_page(results, page_size, page):
     if page_size == None:
         page_size = 10
 
     if page == None:
         page = 1
 
-    else:
-        page = page - 1
-
-    total_file = results.count()
-    total_page = ceil(total_file / page_size)
-
-    if page < 0 or page_size < 0:
-        abort(400, message="Number page or page size is wrong!")
-
-    results = results.limit(page_size)
-    results = results.offset(page * page_size)
+    try:
+        results, total_page, total_file = filter_page(page_size=page_size, page=page)
+    except Exception as e:
+        logger.error(f"Can not get list file! Error: {str(e)}")
+        abort(400, message="Can not get list file!")
 
     return {"results": results, "total_page": total_page, "total_file": total_file}
 
 
-def process_upload_file(single_file):
-    try:
-        schema = UploadFileSchema()
-        result = schema.load({"file_upload": single_file})
+def filter_page(page_size=10, page=1):
+    # Connect to MongoDB and get the collection
+    collection = mongo.db.candidate
 
-        # Get PDF file
-        file_upload = result["file_upload"]
+    # Count total documents in the collection
+    total_file = collection.count_documents({})
 
-        # Add datetime
-        time_upload = datetime.now(timezone("Asia/Ho_Chi_Minh")).strftime(
-            "%Y%m%d%H%M%S-"
-        )
+    # Calculate total pages
+    total_page = ceil(total_file / page_size)
 
-        filename = time_upload + file_upload.filename
-        logger.info(f"Filename: {filename}")
-        filesize = len(file_upload.read())
+    # Validate page and page_size
+    if page < 1 or page_size < 1:
+        abort(400, message="Page number or page size is invalid.")
 
-        # Get hash
-        file_upload.seek(0)
-        filehash = hashlib.sha256(file_upload.read()).hexdigest()
+    # Calculate skip and limit values for pagination
+    skip = (page - 1) * page_size
 
-        # Check if the file already exists in the database
-        file_upload_new = CandidateModel.query.filter_by(cv_hash=filehash).first()
-        if file_upload_new:
-            # File already exists in the database
-            logger.error("File is duplicate!")
-            return {"message": "File is duplicate!"}, 409
+    # Retrieve documents with pagination
+    results = list(collection.find().skip(skip).limit(page_size))
 
-        # Save the file to disk
-        file_upload.seek(0)
-        file_upload.save(os.path.join(config.CV_UPLOAD_DIR, f"{filename}"))
+    return results, total_page, total_file
 
-        # Get type file
-        file_type = filename.split(".")[-1]
-        file_name_upload = file_upload.filename.split(".")[0]
-    except:
-        logger.error("File incorrect format!")
-        abort(400, message="File incorrect format")
 
-    # Analyse Candidate
-    try:
-        analyzer = DocumentAnalyzer()
-        output_analysis = analyzer.analyse_candidate(file_name=filename)
-    except:
-        logger.error("Can not analyse Candidate!")
-        abort(400, message="Can not analyse Candidate!")
+def update_candidate(candidate_data, candidate_id):
+    collection = mongo.db.candidate
+    result = collection.update_one(
+        {"_id": ObjectId(candidate_id)}, {"$set": candidate_data}
+    )
+    if result.modified_count == 1:
+        return {"message": "Document updated successfully"}
+    else:
+        return abort("Document not found")
+
+
+def allowed_file(filename):
+    return "." in filename and filename.rsplit(".", 1)[1].lower() in {"pdf", "docx"}
+
+
+def process_upload_file(file):
+    created_at = datetime.now(timezone("Asia/Ho_Chi_Minh")).strftime(
+        "%Y-%m-%d %H:%M:%S"
+    )
+
+    # Check type pdf or docx
+    if allowed_file(file.filename) == False:
+        abort(400, message="Invalid file type. Allowed types: pdf, docx!")
+
+    # Compute the SHA-256 hash of the file contents and convert it to hexadecimal
+    filehash = hashlib.sha256(file.read()).hexdigest()
+
+    # Check hashfile
+    if mongo.db.candidate.find_one({"filehash": filehash}) != None:
+        abort(400, message=f"CV candidate is exists! File name: {file.filename}")
+
+    # Move the cursor to the beginning of the file
+    file.seek(0)
+
+    analysis_endpoint_url = f"{config.ANALYSIS_SERVICE_URL}/candidate/analyse"
+    files = {"file": (file.filename, file.stream, file.mimetype)}
+    response = requests.post(analysis_endpoint_url, files=files)
+
+    # Check response status and return appropriate response
+    if response.status_code != 200:
+        abort(400, message=f"Fail to analyse CV candidate! File name: {file.filename}")
+
+    # Get the content of the response
+    response_content = response.json()
+
+    response_content["cv_name"] = file.filename
+    response_content["created_at"] = created_at
+    response_content["filehash"] = filehash
 
     # Add to database
     try:
-        candidate_name = (
-            output_analysis["name"]
-            if output_analysis["name"] != ""
-            else file_name_upload
-        )
-        current_datetime = datetime.now(timezone("Asia/Ho_Chi_Minh")).strftime(
-            "%Y-%m-%d %H:%M:%S"
-        )
-        file_upload_new = CandidateModel(
-            candidate_name=candidate_name,
-            candidate_phone=output_analysis["phone"],
-            candidate_email=output_analysis["email"],
-            candidate_summary=output_analysis["summary"],
-            recommended_jobs=output_analysis["recommended_jobs"],
-            cv_name=file_upload.filename,
-            cv_name_analyse=filename,
-            cv_hash=filehash,
-            cv_type=file_type,
-            cv_size=filesize,
-            cv_date=current_datetime,
-        )
-        db.session.add(file_upload_new)
-        db.session.commit()
+        collection = mongo.db.candidate
+        result = collection.insert_one(response_content)
+
+        print("candidate_id", str(result.inserted_id))
+
     except:
         logger.error("Upload document to Database failed!")
         abort(400, message="Upload document to Database failed!")
@@ -177,7 +137,7 @@ def upload_file_cv():
         abort(400, message="Upload document to Database failed!")
 
     for file in uploaded_files:
-        process_upload_file(single_file=file)
+        process_upload_file(file=file)
 
     logger.info(f"Time upload file: {time.time()-start_time:.2f}")
 
@@ -185,18 +145,11 @@ def upload_file_cv():
 
 
 def delete_candidate(candidate_id):
-    # Delete File in Database
-    candidate = CandidateModel.query.filter_by(id=candidate_id).first()
+    result = mongo.db.candidate.delete_one({"_id": ObjectId(candidate_id)})
+    if result.deleted_count == 1:
+        # Clean matching
+        mongo.db.matching.delete_many({"candidate_id": ObjectId(candidate_id)})
 
-    logger.info(f"Delete CV candidate: {candidate.cv_name}")
-
-    # Delete in database
-    try:
-        MatchingModel.query.filter_by(candidate_id=candidate_id).delete()
-        CandidateModel.query.filter_by(id=candidate_id).delete()
-        db.session.commit()
-    except:
-        logger.error(f"Can not delete File: {candidate.cv_name} in database")
-        abort(400, message="File Upload doesn't exist, cannot delete!")
-
-    return {"message": "Delete successfully!"}
+        return {"message": "Document deleted successfully"}
+    else:
+        return abort("Document not found!")

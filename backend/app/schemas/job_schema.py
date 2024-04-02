@@ -2,10 +2,16 @@ from marshmallow import Schema, fields
 
 
 class PlainJobSchema(Schema):
-    id = fields.Int(dump_only=True)
-    job_name = fields.Str(required=True)
-    job_description = fields.Str(required=True)
-    created_at = fields.Str(dump_only=True)
+    _id = fields.Str(dump_only=True)
+    job_name = fields.Str()
+    job_description = fields.Str()
+    created_at = fields.Str()
+    degree = fields.List(fields.Str())
+    experience = fields.List(fields.Str())
+    technical_skill = fields.List(fields.Str())
+    responsibility = fields.List(fields.Str())
+    soft_skill = fields.List(fields.Str())
+    certificate = fields.List(fields.Str())
 
 
 class CreateUpdateJobSchema(Schema):
