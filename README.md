@@ -58,12 +58,12 @@ Follow these steps to get the Resume Ranking System up and running:
 1. **Clone the Repository**:
 
    ```bash
-   git clone https://github.com/your-username/resume-ranking.git
+   git clone https://github.com/vectornguyen76/resume-ranking.git
    ```
 
 2. **Update environment**:
 
-   - Update **OPENAI_API_KEY** in `backend/.env.api.local`
+   - Update **OPENAI_API_KEY** in `analysis_service/.env`
 
      ```bash
      OPENAI_API_KEY="your-key"

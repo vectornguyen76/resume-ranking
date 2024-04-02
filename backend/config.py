@@ -3,8 +3,6 @@ import os
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
-
-GPT_MODEL = "gpt-3.5-turbo-0613"
 ANALYSIS_SERVICE_URL = os.environ.get("ANALYSIS_SERVICE_URL")
 
 
@@ -19,23 +17,6 @@ class DefaultConfig:
     PROPAGATE_EXCEPTIONS = True
     DEBUG = False
     TESTING = False
-
-    # Configuration of Flask-JWT-Extended
-    JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY")
-    # Determines the minutes that the access token remains active
-    JWT_ACCESS_TOKEN_EXPIRES = datetime.timedelta(minutes=30)
-    # Determines the days that the refresh token remains active
-    JWT_REFRESH_TOKEN_EXPIRES = datetime.timedelta(days=30)
-    # Algorithm used to generate the token
-    JWT_ALGORITHM = "HS256"
-    # Algorithm used to decode the token
-    JWT_DECODE_ALGORITHMS = "HS256"
-    # Header that should contain the JWT in a request
-    JWT_HEADER_NAME = "Authorization"
-    # Word that goes before the token in the Authorization header in this case empty
-    JWT_HEADER_TYPE = "Bearer"
-    # Where to look for a JWT when processing a request.
-    JWT_TOKEN_LOCATION = "headers"
 
     # Config API documents
     API_TITLE = "Template REST API"
