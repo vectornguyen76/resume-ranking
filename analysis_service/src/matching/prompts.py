@@ -97,7 +97,7 @@ fn_matching_analysis = [
                     },
                     "required": ["score", "comment"],
                 },
-                "soft_kkill": {
+                "soft_skill": {
                     "type": "object",
                     "properties": {
                         "score": {
