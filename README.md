@@ -1,5 +1,9 @@
 # Resume Ranking Application
 
+[![Development](https://github.com/vectornguyen76/resume-ranking/actions/workflows/development_pipeline.yml/badge.svg)](https://github.com/vectornguyen76/resume-ranking/actions/workflows/development_pipeline.yml)
+[![Staging](https://github.com/vectornguyen76/resume-ranking/actions/workflows/staging_pipeline.yml/badge.svg)](https://github.com/vectornguyen76/resume-ranking/actions/workflows/staging_pipeline.yml)
+[![Production](https://github.com/vectornguyen76/resume-ranking/actions/workflows/production_pipeline.yml/badge.svg)](https://github.com/vectornguyen76/resume-ranking/actions/workflows/production_pipeline.yml)
+
 ## Overview
 
 The Resume Ranking Application is an AI-powered recruitment tool that leverages Large Language Models (LLM) and advanced NLP techniques to automatically evaluate, analyze, and rank resumes based on job requirements. Built with FastAPI, Next.js, and OpenAI's GPT models, it provides intelligent candidate-job matching with detailed scoring and analysis.
