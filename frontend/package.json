@@ -6,8 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "preinstall": "npx only-allow pnpm"
+    "lint": "next lint"
   },
   "dependencies": {
     "@emotion/react": "^11.10.6",
@@ -25,13 +24,13 @@
     "eslint-config-next": "^14.1.0",
     "next": "^14.1.0",
     "next-auth": "^4.21.1",
-    "quill": "^1.3.7",
+    "quill": "^2.0.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.43.9",
     "react-icons": "^4.8.0",
     "react-paginate": "^8.2.0",
-    "react-quill": "^2.0.0",
+    "react-quill": "^0.0.2",
     "react-table": "^7.8.0",
     "react-toastify": "^9.1.2",
     "sharp": "^0.32.0",
