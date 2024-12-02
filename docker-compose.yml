@@ -2,18 +2,16 @@ version: "3"
 services:
   analysis_service:
     container_name: analysis_service
-    image: vectornguyen76/resume_ranking_analysis
+    image: vectornguyen76/analysis_service
     build:
       context: ./analysis_service
       dockerfile: Dockerfile
-    env_file:
-      - ./analysis_service/.env
     volumes:
       - ./analysis_service/logs:/app/logs
       - ./analysis_service/candidate_cv:/app/candidate_cv
 
   frontend_service:
-    container_name: frontend_container
+    container_name: resume_ranking_frontend
     image: vectornguyen76/resume_ranking_frontend
     build:
       context: ./frontend
@@ -23,7 +21,7 @@ services:
     #   - 3000:3000
 
   backend_service:
-    container_name: backend
+    container_name: resume_ranking_backend
     image: vectornguyen76/resume_ranking_backend
     build:
       context: ./backend
@@ -48,7 +46,7 @@ services:
       - 27017:27017
 
   nginx_service:
-    container_name: nginx_container
+    container_name: resume_ranking_nginx
     image: nginx:1.25.1-alpine
     ports:
       - 80:80
