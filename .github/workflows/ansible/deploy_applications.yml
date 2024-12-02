@@ -9,16 +9,13 @@
     - ansible_host_key_checking: false
     - ansible_stdout_callback: yaml
 
-    - image_search_image: vectornguyen76/image_search
-    - image_search_tag: latest
+    - analysis_service_image: vectornguyen76/analysis_service
+    - analysis_service_tag: latest
 
-    - text_search_image: vectornguyen76/text_search
-    - text_search_tag: latest
-
-    - backend_image: vectornguyen76/backend_search_engine
+    - backend_image: vectornguyen76/backend_resume_ranking
     - backend_tag: latest
 
-    - frontend_image: vectornguyen76/frontend_search_engine
+    - frontend_image: vectornguyen76/frontend_resume_ranking
     - frontend_tag: latest
 
   pre_tasks:

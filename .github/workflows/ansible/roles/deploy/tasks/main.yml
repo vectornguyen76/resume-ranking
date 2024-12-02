@@ -15,16 +15,10 @@
     src: "/home/ubuntu/server/artifact.zip"
     dest: "/home/ubuntu/server"
 
-- name: Pull image search image
+- name: Pull analysis service image
   community.docker.docker_image:
-    name: "{{ image_search_image }}"
-    tag: "{{ image_search_tag }}"
-    source: pull
-
-- name: Pull text search image
-  community.docker.docker_image:
-    name: "{{ text_search_image }}"
-    tag: "{{ text_search_tag }}"
+    name: "{{ analysis_service_image }}"
+    tag: "{{ analysis_service_tag }}"
     source: pull
 
 - name: Pull backend image
@@ -43,4 +37,4 @@
   become: True
   shell:
     chdir: /home/ubuntu/server
-    cmd: "docker compose --profile dev up -d"
+    cmd: "docker compose up -d"
