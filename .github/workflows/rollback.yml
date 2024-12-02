@@ -1,0 +1,56 @@
+name: rollback
+
+on:
+  workflow_call:
+    inputs:
+      stack_name:
+        description: "The stack name to destroy"
+        required: true
+        type: string
+    secrets:
+      AWS_ACCESS_KEY_ID:
+        required: true
+      AWS_SECRET_ACCESS_KEY:
+        required: true
+
+jobs:
+  remove-stack:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Declare variables
+        shell: bash
+        run: |
+          echo "SHA_SHORT=$(git rev-parse --short "$GITHUB_SHA")" >> "$GITHUB_ENV"
+
+      - name: Configure AWS credentials
+        id: creds
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Remove stack on fail
+        run: |
+          echo ${{ inputs.stack_name }}-${{ env.SHA_SHORT }}
+          # Get stack id for the delete_stack waiter
+          stack_info=$(aws cloudformation describe-stacks --stack-name ${{ inputs.stack_name }}-${{ env.SHA_SHORT }} --query "Stacks[*] | [0].StackId" 2>&1)
+          if echo $stack_info | grep 'does not exist' > /dev/null
+          then
+            echo "Stack does not exist."
+            echo $stack_info
+            exit 0
+          fi
+          if echo $stack_info | grep 'ValidationError' > /dev/null
+          then
+            echo $stack_info
+            exit 1
+          else
+            aws cloudformation delete-stack --stack-name ${{ inputs.stack_name }}-${{ env.SHA_SHORT }}
+            echo $stack_info
+            aws cloudformation wait stack-delete-complete --stack-name ${{ inputs.stack_name }}-${{ env.SHA_SHORT }}
+            exit 0
+          fi

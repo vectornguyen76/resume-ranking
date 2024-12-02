@@ -2,7 +2,7 @@ import os
 
 from app.blueprint import register_routing
 from app.db import mongo
-from app.extention import cors, migrate
+from app.extention import cors
 from app.utils.logging import configure_logging
 from flask import Flask
 

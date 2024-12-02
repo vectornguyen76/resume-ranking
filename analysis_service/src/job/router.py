@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from src.job import service
-from src.job.schemas import JobSchema, ResponseSchema
+from src.job.schemas import JobSchema
 
 router = APIRouter()
 

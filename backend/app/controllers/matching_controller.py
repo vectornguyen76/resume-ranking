@@ -1,4 +1,10 @@
-from app.schemas.matching_schema import *
+from app.schemas.matching_schema import (
+    ProcessMatchingSchema,
+    MatchingSchema,
+    MatchingFilterPageSchema,
+    MatchingPageSchema,
+    MatchingDetailSchema,
+)
 from app.services import matching_service
 from flask.views import MethodView
 from flask_smorest import Blueprint
