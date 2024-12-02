@@ -14,7 +14,7 @@ jobs:
     uses: ./.github/workflows/cd.yml
     with:
       stack_name: resume-ranking-prod
-      domain_name: resumeranking.vectornguyen.com
+      domain_name: jobfit.vectornguyen.com
       hosted_zone_id: Z02762033GQ721WO21JL8
     secrets: inherit
 
