@@ -1,0 +1,8 @@
+name: development
+on:
+  push:
+    branches:
+      - develop
+jobs:
+  ci:
+    uses: ./.github/workflows/ci.yml

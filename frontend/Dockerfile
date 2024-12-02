@@ -4,12 +4,12 @@ WORKDIR /app
 
 COPY package.json .
 
-RUN npm i -g pnpm
-
-RUN pnpm install
+RUN npm install
 
 COPY . .
 
-RUN pnpm run build
+RUN npm run build
 
 EXPOSE 3000
+
+CMD npm start

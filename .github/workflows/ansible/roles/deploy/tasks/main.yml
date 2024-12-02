@@ -1,0 +1,40 @@
+- name: "Creates directory"
+  file:
+    path: "/home/ubuntu/server"
+    state: "directory"
+    mode: 0755
+
+- name: "Copy compressed app folder"
+  copy:
+    src: "artifact.zip"
+    dest: "/home/ubuntu/server/artifact.zip"
+
+- name: "Extract app"
+  ansible.builtin.unarchive:
+    remote_src: yes
+    src: "/home/ubuntu/server/artifact.zip"
+    dest: "/home/ubuntu/server"
+
+- name: Pull analysis service image
+  community.docker.docker_image:
+    name: "{{ analysis_service_image }}"
+    tag: "{{ analysis_service_tag }}"
+    source: pull
+
+- name: Pull backend image
+  community.docker.docker_image:
+    name: "{{ backend_image }}"
+    tag: "{{ backend_tag }}"
+    source: pull
+
+- name: Pull frontend image
+  community.docker.docker_image:
+    name: "{{ frontend_image }}"
+    tag: "{{ frontend_tag }}"
+    source: pull
+
+- name: Run docker compose
+  become: True
+  shell:
+    chdir: /home/ubuntu/server
+    cmd: "docker compose up -d"

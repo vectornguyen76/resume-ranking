@@ -1,0 +1,38 @@
+[
+  {
+    "ParameterKey": "DomainName",
+    "ParameterValue": "search.vectornguyen.com"
+  },
+  {
+    "ParameterKey": "HostedZoneId",
+    "ParameterValue": "Z02762033GQ721WO21JL8"
+  },
+  {
+    "ParameterKey": "VpcCIDR",
+    "ParameterValue": "10.0.0.0/16"
+  },
+  {
+    "ParameterKey": "PublicSubnetCIDR1",
+    "ParameterValue": "10.0.1.0/24"
+  },
+  {
+    "ParameterKey": "PublicSubnetCIDR2",
+    "ParameterValue": "10.0.2.0/24"
+  },
+  {
+    "ParameterKey": "InstanceType",
+    "ParameterValue": "t3.medium"
+  },
+  {
+    "ParameterKey": "VolumeSize",
+    "ParameterValue": "60"
+  },
+  {
+    "ParameterKey": "KeyPairName",
+    "ParameterValue": "vector"
+  },
+  {
+    "ParameterKey": "AMItoUse",
+    "ParameterValue": "ami-053b0d53c279acc90"
+  }
+]

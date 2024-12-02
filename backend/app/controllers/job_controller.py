@@ -1,4 +1,9 @@
-from app.schemas.job_schema import *
+from app.schemas.job_schema import (
+    PlainJobSchema,
+    CreateUpdateJobSchema,
+    JobFilterPageSchema,
+    JobPageSchema,
+)
 from app.services import job_service
 from flask.views import MethodView
 from flask_smorest import Blueprint

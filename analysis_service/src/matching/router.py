@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from src.matching import service
-from src.matching.schemas import MatchingSchema, ResponseSchema
+from src.matching.schemas import MatchingSchema
 
 router = APIRouter()
 

@@ -26,10 +26,10 @@ def get_list_candidate(file_data):
     page_size = file_data["page_size"]
     page = file_data["page"]
 
-    if page_size == None:
+    if page_size is None:
         page_size = 10
 
-    if page == None:
+    if page is None:
         page = 1
 
     try:
@@ -85,14 +85,14 @@ def process_upload_file(file):
     )
 
     # Check type pdf or docx
-    if allowed_file(file.filename) == False:
+    if not allowed_file(file.filename):
         abort(400, message="Invalid file type. Allowed types: pdf, docx!")
 
     # Compute the SHA-256 hash of the file contents and convert it to hexadecimal
     filehash = hashlib.sha256(file.read()).hexdigest()
 
     # Check hashfile
-    if mongo.db.candidate.find_one({"filehash": filehash}) != None:
+    if mongo.db.candidate.find_one({"filehash": filehash}):
         abort(400, message=f"CV candidate is exists! File name: {file.filename}")
 
     # Move the cursor to the beginning of the file
@@ -120,8 +120,8 @@ def process_upload_file(file):
 
         print("candidate_id", str(result.inserted_id))
 
-    except:
-        logger.error("Upload document to Database failed!")
+    except Exception as e:
+        logger.error(f"Upload document to Database failed! Error: {str(e)}")
         abort(400, message="Upload document to Database failed!")
 
     return None

@@ -1,0 +1,29 @@
+name: production
+
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    uses: ./.github/workflows/ci.yml
+
+  deploy:
+    needs: build
+    uses: ./.github/workflows/cd.yml
+    with:
+      stack_name: resume-ranking-prod
+      domain_name: jobfit.vectornguyen.com
+      hosted_zone_id: Z02762033GQ721WO21JL8
+    secrets: inherit
+
+  rollback:
+    needs: deploy
+    if: failure()
+    uses: ./.github/workflows/rollback.yml
+    with:
+      stack_name: resume-ranking-prod
+    secrets:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

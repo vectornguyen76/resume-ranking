@@ -1,6 +1,5 @@
 from fastapi import APIRouter, File, UploadFile
 from src.candidate import service
-from src.candidate.schemas import ResponseSchema
 
 router = APIRouter()
 

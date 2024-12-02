@@ -1,0 +1,424 @@
+name: continuous_delivery
+
+on:
+  workflow_call:
+    inputs:
+      stack_name:
+        description: "The destroy stack name"
+        required: true
+        type: string
+
+      domain_name:
+        description: "The domain name"
+        required: true
+        type: string
+
+      hosted_zone_id:
+        description: "The hosted zone id"
+        required: true
+        type: string
+
+    secrets:
+      OPENAI_API_KEY:
+      AWS_ACCESS_KEY_ID:
+      AWS_SECRET_ACCESS_KEY:
+
+      SSH_PRIVATE_KEY:
+      DOCKERHUB_USERNAME:
+      DOCKERHUB_PASSWORD:
+
+jobs:
+  create-infrastructure:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Declare variables
+        shell: bash
+        run: |
+          echo "SHA_SHORT=$(git rev-parse --short "$GITHUB_SHA")" >> "$GITHUB_ENV"
+
+      - name: Configure AWS credentials
+        id: creds
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Determine active environment
+        run: |
+          # Get current active environment (blue or green)
+          ACTIVE_ENV=$(aws ec2 describe-instances \
+            --filters "Name=tag:ApplicationName,Values=Resume Ranking" "Name=instance-state-name,Values=running" \
+            --query 'Reservations[].Instances[].Tags[?Key==`Environment`].Value' \
+            --output text || echo "none")
+
+          # If no environment or blue is active, deploy to green. Otherwise deploy to blue
+          if [ "$ACTIVE_ENV" = "blue" ] || [ "$ACTIVE_ENV" = "none" ]; then
+            echo "DEPLOY_ENV=green" >> $GITHUB_ENV
+            echo "CURRENT_ENV=blue" >> $GITHUB_ENV
+          else
+            echo "DEPLOY_ENV=blue" >> $GITHUB_ENV
+            echo "CURRENT_ENV=green" >> $GITHUB_ENV
+          fi
+
+      - name: Deploy to AWS CloudFormation
+        uses: aws-actions/aws-cloudformation-github-deploy@v1
+        with:
+          name: ${{ inputs.stack_name }}-${{ env.SHA_SHORT }}
+          template: ./.github/workflows/cloudformations/server.yml
+          parameter-overrides: >-
+            DomainName=${{ inputs.domain_name }},
+            HostedZoneId=${{ inputs.hosted_zone_id }},
+            VpcCIDR=10.0.0.0/16,
+            PublicSubnetCIDR1=10.0.1.0/24,
+            PublicSubnetCIDR2=10.0.2.0/24,
+            InstanceType=t3.medium,
+            VolumeSize=60,
+            KeyPairName=vector,
+            AMItoUse=ami-053b0d53c279acc90,
+            Environment=${{ env.DEPLOY_ENV }}
+          tags: ${{ vars.TAGS }}
+
+      - name: Get Public DNS Server
+        run: |
+          # Create file
+          backend_public_dns=${{ inputs.stack_name }}-${{ env.SHA_SHORT }}-PublicDNS
+
+          # Pull the export value
+          host=$(aws cloudformation list-exports \
+          --query "Exports[?Name==\`$backend_public_dns\`].Value" \
+          --no-paginate --output text)
+
+          # Log
+          echo $host
+
+          # Save host to artifact
+          mkdir -p workspace/artifact
+
+          echo $host > workspace/artifact/host.txt
+
+      - name: Save and upload host to artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: host-artifact
+          path: workspace/artifact/host.txt
+
+  deploy-analysis-service:
+    runs-on: ubuntu-latest
+    needs:
+      - create-infrastructure
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Login to Docker Hub
+        id: docker_hub_auth
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: Add env variable to env file
+        working-directory: analysis_service
+        run: |
+          # Add env variable to .env
+          echo OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} >> .env
+
+      - name: Build and push
+        uses: docker/build-push-action@v4
+        with:
+          context: ./analysis_service
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/analysis_service:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy-backend:
+    runs-on: ubuntu-latest
+    needs:
+      - create-infrastructure
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Login to Docker Hub
+        id: docker_hub_auth
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v4
+        with:
+          context: ./backend
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/resume_ranking_backend:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy-frontend:
+    runs-on: ubuntu-latest
+    needs:
+      - create-infrastructure
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Login to Docker Hub
+        id: docker_hub_auth
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: Download artifact to get host
+        uses: actions/download-artifact@master
+        with:
+          name: host-artifact
+          path: workspace/artifact
+
+      - name: Read DNS Server IP
+        run: echo "DNS_SERVER=$(cat workspace/artifact/host.txt)" >> $GITHUB_ENV
+
+      - name: Add env variable to env file
+        working-directory: frontend
+        run: |
+          # Add env variable to .env.production
+          echo NEXT_PUBLIC_API_URL=https://${{ inputs.domain_name }}/backend >> .env.production
+
+      - name: Build and push frontend image
+        uses: docker/build-push-action@v4
+        with:
+          context: ./frontend
+          file: ./frontend/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/resume_ranking_frontend:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  config-application:
+    runs-on: ubuntu-latest
+    needs:
+      - deploy-analysis-service
+      - deploy-backend
+      - deploy-frontend
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Declare variables
+        shell: bash
+        run: |
+          echo "SHA_SHORT=$(git rev-parse --short "$GITHUB_SHA")" >> "$GITHUB_ENV"
+
+      - name: Configure AWS credentials
+        id: creds
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Download artifact to get host
+        uses: actions/download-artifact@master
+        with:
+          name: host-artifact
+          path: workspace/artifact
+
+      - name: Append the DNS to the inventory file
+        run: cat workspace/artifact/host.txt >> $(eval echo "./.github/workflows/ansible/hosts")
+
+      - name: Zip artifact files
+        uses: montudor/action-zip@v1
+        with:
+          args: zip -qq -r artifact.zip .
+
+      - name: Create files forlder in ansible
+        run: mkdir -p ./.github/workflows/ansible/roles/deploy/files
+
+      - name: Copy file
+        uses: canastro/copy-file-action@master
+        with:
+          source: "artifact.zip"
+          target: "./.github/workflows/ansible/roles/deploy/files/artifact.zip"
+
+      - name: Run playbook
+        uses: dawidd6/action-ansible-playbook@v2
+        with:
+          playbook: deploy_applications.yml
+          directory: ./.github/workflows/ansible
+          key: ${{secrets.SSH_PRIVATE_KEY}}
+          options: |
+            --inventory ./hosts
+
+  smoke-test:
+    runs-on: ubuntu-latest
+    needs:
+      - config-application
+    steps:
+      - name: Download artifact to get host
+        uses: actions/download-artifact@master
+        with:
+          name: host-artifact
+          path: workspace/artifact
+
+      - name: Read DNS Server IP
+        run: echo "DNS_SERVER=$(cat workspace/artifact/host.txt)" >> $GITHUB_ENV
+
+      - name: Health check
+        id: health_check
+        run: |
+          MAX_RETRIES=30
+          RETRY_INTERVAL=10
+
+          for i in $(seq 1 $MAX_RETRIES); do
+              # Using curl with -w to get HTTP status code and -o /dev/null to discard the response body
+              status_code=$(curl -s -w "%{http_code}" -o /dev/null "http://${{ env.DNS_SERVER }}/dashboard/jobs")
+
+              if [ "$status_code" = "200" ]; then
+                  echo "Health check passed - Status code: 200"
+                  exit 0
+              fi
+
+              echo "Attempt $i of $MAX_RETRIES failed. Status code: $status_code"
+              echo "Retrying in $RETRY_INTERVAL seconds..."
+              sleep $RETRY_INTERVAL
+          done
+
+          echo "Health check failed after $MAX_RETRIES attempts"
+          echo "Last status code: $status_code"
+          exit 1
+
+  switch-traffic:
+    runs-on: ubuntu-latest
+    needs:
+      - smoke-test
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Declare variables
+        shell: bash
+        run: |
+          echo "SHA_SHORT=$(git rev-parse --short "$GITHUB_SHA")" >> "$GITHUB_ENV"
+
+      - name: Configure AWS credentials
+        id: creds
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Get Load Balancer details
+        run: |
+          # Get the new ALB DNS name and zone ID from CloudFormation exports
+          NEW_ALB_DNS=$(aws cloudformation list-exports \
+            --query "Exports[?Name=='${{ inputs.stack_name }}-${{ env.SHA_SHORT }}-LoadBalancerDNSName'].Value" \
+            --output text)
+          NEW_ALB_ZONE_ID=$(aws cloudformation list-exports \
+            --query "Exports[?Name=='${{ inputs.stack_name }}-${{ env.SHA_SHORT }}-LoadBalancerHostedZoneId'].Value" \
+            --output text)
+
+          # Save to environment variables
+          echo "NEW_ALB_DNS=$NEW_ALB_DNS" >> $GITHUB_ENV
+          echo "NEW_ALB_ZONE_ID=$NEW_ALB_ZONE_ID" >> $GITHUB_ENV
+
+      - name: Switch traffic to new environment
+        run: |
+          # Update DNS record to point to new environment
+          aws route53 change-resource-record-sets \
+            --hosted-zone-id ${{ inputs.hosted_zone_id }} \
+            --change-batch '{
+              "Changes": [{
+                "Action": "UPSERT",
+                "ResourceRecordSet": {
+                  "Name": "${{ inputs.domain_name }}",
+                  "Type": "A",
+                  "AliasTarget": {
+                    "HostedZoneId": "${{ env.NEW_ALB_ZONE_ID }}",
+                    "DNSName": "${{ env.NEW_ALB_DNS }}",
+                    "EvaluateTargetHealth": false
+                  }
+                }
+              }]
+            }'
+
+  clean-up:
+    runs-on: ubuntu-latest
+    needs:
+      - switch-traffic
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Declare some variables
+        shell: bash
+        run: |
+          echo "SHA_SHORT=$(git rev-parse --short "$GITHUB_SHA")" >> "$GITHUB_ENV"
+
+      - name: Configure AWS credentials
+        id: creds
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Fetch stacks and save the old stack name
+        run: |
+          # Fetch the stack names
+          export STACKS=(
+            $(aws cloudformation list-stacks \
+                --query "StackSummaries[*].StackName" \
+                --no-paginate --output text \
+                --stack-status-filter CREATE_COMPLETE UPDATE_COMPLETE
+            )
+          )
+          for stack in "${STACKS[@]}"; do
+            if [[ ! "$stack" =~ "${{ env.SHA_SHORT }}" ]] && [[ "$stack" =~ "${{ inputs.stack_name }}" ]]; then
+              echo "DESTROY_STACK=$stack" >> "$GITHUB_ENV"
+            fi
+          done
+
+      - name: Remove the infrastructure
+        run: |
+          # Check if DESTROY_STACK is not set
+          if [ -z "${{ env.DESTROY_STACK }}" ]; then
+            echo "DESTROY_STACK is not set"
+            exit 0
+          else
+            echo "DESTROY_STACK is set to ${{ env.DESTROY_STACK }}"
+          fi
+
+          # Get stack id for the delete_stack waiter
+          stack_info=$(aws cloudformation describe-stacks --stack-name ${{ env.DESTROY_STACK }} --query "Stacks[*] | [0].StackId" 2>&1)
+          if echo $stack_info | grep 'does not exist' > /dev/null
+          then
+            echo "Stack does not exist."
+            echo $stack_info
+            exit 0
+          fi
+          if echo $stack_info | grep 'ValidationError' > /dev/null
+          then
+            echo $stack_info
+            exit 1
+          else
+            aws cloudformation delete-stack --stack-name ${{ env.DESTROY_STACK }}
+            echo $stack_info
+            aws cloudformation wait stack-delete-complete --stack-name ${{ env.DESTROY_STACK }}
+            exit 0
+          fi

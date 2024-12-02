@@ -1,4 +1,9 @@
-from app.schemas.candidate_schema import *
+from app.schemas.candidate_schema import (
+    CandidateFilterSchema,
+    CandidatePageSchema,
+    CandidateSchema,
+    UpdateCandidateSchema,
+)
 from app.services import candidate_service
 from flask.views import MethodView
 from flask_smorest import Blueprint

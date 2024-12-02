@@ -1,4 +1,4 @@
-system_prompt_candidate = f"""
+system_prompt_candidate = """
 Let's think step by step.
 CV details might be out of order or incomplete.
 Analyze the CV concerning the candidate's experience and career. From this, derive logical conclusions about their technical skills, experience, and soft skills.

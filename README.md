@@ -1,8 +1,18 @@
-# Resume Ranking System
+# Resume Ranking Application
+
+[![Development](https://github.com/vectornguyen76/resume-ranking/actions/workflows/development_pipeline.yml/badge.svg)](https://github.com/vectornguyen76/resume-ranking/actions/workflows/development_pipeline.yml)
+[![Staging](https://github.com/vectornguyen76/resume-ranking/actions/workflows/staging_pipeline.yml/badge.svg)](https://github.com/vectornguyen76/resume-ranking/actions/workflows/staging_pipeline.yml)
+[![Production](https://github.com/vectornguyen76/resume-ranking/actions/workflows/production_pipeline.yml/badge.svg)](https://github.com/vectornguyen76/resume-ranking/actions/workflows/production_pipeline.yml)
 
 ## Overview
 
-The Resume Ranking System is a powerful tool designed to streamline the recruitment process by automatically evaluating and ranking resumes based on relevant criteria.
+The Resume Ranking Application is an AI-powered recruitment tool that leverages Large Language Models (LLM) and advanced NLP techniques to automatically evaluate, analyze, and rank resumes based on job requirements. Built with FastAPI, Next.js, and OpenAI's GPT models, it provides intelligent candidate-job matching with detailed scoring and analysis.
+
+## Demo Video
+
+[![Resume Ranking Application Demo](https://img.youtube.com/vi/Gd178Pd48Q4/0.jpg)](https://youtu.be/Gd178Pd48Q4)
+
+Click the image above to watch the demo video on YouTube.
 
 ## Architecture
 
@@ -12,48 +22,73 @@ The Resume Ranking System is a powerful tool designed to streamline the recruitm
   <em>System Architecture</em>
 </p>
 
+## Key Technologies
+
+- **Backend**: FastAPI, Flask, MongoDB
+- **Frontend**: Next.js, TypeScript, TailwindCSS
+- **AI/ML**: OpenAI GPT models, LangChain
+- **Infrastructure**: Docker, Nginx, GitHub Actions, AWS
+
 ## Features
 
-- **Job Analysis**:
+### Job Description Analysis
 
-  - Manage JDs
-  - Analyze JDs to standard forma
-  - Multilingual Support.
-  - Average runtime: 30 seconds
+- **Intelligent JD Parsing**:
+  - Extracts key requirements, skills, and qualifications using LLM
+  - Structures data into standardized format for matching
+  - Supports multiple languages through GPT's multilingual capabilities
+  - Average processing time: 3 seconds
 
-- **Candidate Analysis**:
+### Resume Analysis
 
-  - Upload and manage CVs (PDF/ Word)
-  - Extract Personal information.
-  - Analyze CVs to standard format.
-  - Multilingual Support.
-  - Average runtime: 60 seconds
+- **Advanced CV Processing**:
+  - Handles PDF and Word documents
+  - Extracts and structures candidate information using LLM
+  - Identifies skills, experience, and qualifications
+  - Supports multilingual resumes
+  - Average processing time: 5-10 seconds
 
-- **Matching Analysis**:
+### AI-Powered Matching
 
-  - Manage candidates & jobs with a
-    many-to-many relationship
-  - Analyze and score candidate based
-    on each key field.
-  - Average runtime: 30 seconds
+- **Sophisticated Matching Algorithm**:
+  - Uses LangChain for orchestrating complex LLM operations
+  - Function calling for structured data extraction
+  - Semantic understanding of job requirements and candidate qualifications
+  - Many-to-many relationship support
+  - Average processing time: 3-5 seconds
 
-- **Score, Rank & Comment**:
-  - Provides a summary analysis of the
-    matching between candidates and
-    jobs
-  - Score and rank candidate.
+### Intelligent Ranking
+
+- **Smart Evaluation System**:
+  - Generates detailed match analysis using GPT models
+  - Provides scoring based on multiple criteria
+  - Offers AI-generated feedback and comments
+  - Ranks candidates based on overall fit
+
+## Technical Features
+
+- **FastAPI Integration**:
+
+  - Async request handling
+  - Automatic API documentation with Swagger UI
+  - Type validation with Pydantic models
+
+- **LangChain Implementation**:
+
+  - Custom prompt engineering
+  - Structured output parsing
+  - Chain of thought reasoning
+
+- **OpenAI Function Calling**:
+  - Structured data extraction
+  - Consistent output formatting
+  - Enhanced control over LLM responses
 
 ## Documentation
 
-Detailed documentation on how to use, configure, and extend the system is available in the [User Guide](https://drive.google.com/file/d/1PWt5uJq1rc59S7lkV6PjxDPamHyDmKRZ/view?usp=sharing).
-
-## Video Demo
-
-For a visual walkthrough of the system's functionality, check out our [Video Demo](https://drive.google.com/file/d/1PDeT4UUuug6Olk9dSZMHTaLY19AT0Oaq/view?usp=sharing).
+Detailed documentation on system architecture, API endpoints, and configuration options is available in the [User Guide](./assets/presentation.pdf).
 
 ## Getting Started
-
-Follow these steps to get the Resume Ranking System up and running:
 
 1. **Clone the Repository**:
 
@@ -61,35 +96,53 @@ Follow these steps to get the Resume Ranking System up and running:
    git clone https://github.com/vectornguyen76/resume-ranking.git
    ```
 
-2. **Update environment**:
+2. **Configure Environment**:
 
-   - Update **OPENAI_API_KEY** in `analysis_service/.env`
-
+   - Set up OpenAI API key:
      ```bash
+     # analysis_service/.env
      OPENAI_API_KEY="your-key"
      ```
-
-   - Update **IP Address** in `frontend/.env.production`
+   - Configure frontend API URL:
      ```bash
+     # frontend/.env.production
      NEXT_PUBLIC_API_URL=http://<your-ip-address>/backend
      ```
 
-3. **Install Dependencies**:
+3. **Build and Run**:
 
    ```bash
    cd resume-ranking
    docker compose build
-   ```
-
-4. **Run the System**:
-
-   ```bash
    docker compose up
    ```
 
-## Contributing
+4. **Access Application**:
+   - Frontend: `http://your-ip-address`
 
-We welcome contributions! If you'd like to contribute to the project, please follow our [Contribution Guidelines](CONTRIBUTING.md).
+## Development
+
+- **Code Quality**:
+
+  - Ruff for Python linting
+  - ESLint for TypeScript/JavaScript
+  - Pre-commit hooks for code formatting
+
+- **Testing**:
+
+  - Unit tests with pytest
+  - Integration tests for API endpoints
+  - Frontend testing with React Testing Library
+
+- **CI/CD**:
+  - Automated testing with GitHub Actions
+  - Docker image builds
+  - Deployment automation
+
+## Contributors
+
+- [Pham Phu Ngoc Trai](https://github.com/jayllfpt)
+- [Vector Nguyen](https://github.com/vectornguyen76)
 
 ## License
 

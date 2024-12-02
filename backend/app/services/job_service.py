@@ -48,8 +48,8 @@ def post_job(job_data):
 
         print("job_id", str(result.inserted_id))
 
-    except:
-        logger.error("Upload document to Database failed!")
+    except Exception as e:
+        logger.error(f"Upload document to Database failed! Error: {str(e)}")
         abort(400, message="Upload document to Database failed!")
 
     return response_content
@@ -59,10 +59,10 @@ def get_list_job(job_data):
     page_size = job_data["page_size"]
     page = job_data["page"]
 
-    if page_size == None:
+    if page_size is None:
         page_size = 10
 
-    if page == None:
+    if page is None:
         page = 1
 
     try:

@@ -1,6 +1,4 @@
-import json
 import logging
-import os
 from math import ceil
 
 import config
@@ -58,7 +56,7 @@ def process_matching(matching_data):
 
         # Check response status and return appropriate response
         if response.status_code != 200:
-            abort(400, message=f"Fail to analyse matching!")
+            abort(400, message="Fail to analyse matching!")
 
         # Get the content of the response
         response_content = response.json()
@@ -73,8 +71,8 @@ def process_matching(matching_data):
 
             logger.info(f"id matching {result.inserted_id}")
 
-        except:
-            logger.error("Upload document to Database failed!")
+        except Exception as e:
+            logger.error(f"Upload document to Database failed! Error: {str(e)}")
             abort(400, message="Upload document to Database failed!")
 
     return {"message": "Analyse matching successfully!"}
@@ -96,21 +94,16 @@ def filter_matching_data(matching_data):
     )
     try:
         pass
-    except:
-        logger.error("Can not get list file!")
+    except Exception as e:
+        logger.error(f"Can not get list file! Error: {str(e)}")
         abort(400, message="Can not get list file!")
 
     return results
 
 
 def filter_page(page_size, page, job_id):
-    if page_size == None:
-        page_size = 10
-
-    if page == None:
-        page = 1
-    else:
-        page = page - 1
+    page_size = 10 if page_size is None else page_size
+    page = 1 if page is None else page - 1
 
     # Connect to MongoDB and get the collection
     collection_candidate = mongo.db.candidate
