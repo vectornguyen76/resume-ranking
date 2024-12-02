@@ -12,10 +12,10 @@
     - analysis_service_image: vectornguyen76/analysis_service
     - analysis_service_tag: latest
 
-    - backend_image: vectornguyen76/backend_resume_ranking
+    - backend_image: vectornguyen76/resume_ranking_backend
     - backend_tag: latest
 
-    - frontend_image: vectornguyen76/frontend_resume_ranking
+    - frontend_image: vectornguyen76/resume_ranking_frontend
     - frontend_tag: latest
 
   pre_tasks:

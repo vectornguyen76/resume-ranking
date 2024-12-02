@@ -162,7 +162,7 @@ jobs:
         with:
           context: ./backend
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/backend_resume_ranking:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/resume_ranking_backend:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -205,7 +205,7 @@ jobs:
           context: ./frontend
           file: ./frontend/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/frontend_resume_ranking:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/resume_ranking_frontend:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
