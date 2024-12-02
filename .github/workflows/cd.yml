@@ -286,7 +286,7 @@ jobs:
 
           for i in $(seq 1 $MAX_RETRIES); do
               # Using curl with -w to get HTTP status code and -o /dev/null to discard the response body
-              status_code=$(curl -s -w "%{http_code}" -o /dev/null "http://${{ env.DNS_SERVER }}")
+              status_code=$(curl -s -w "%{http_code}" -o /dev/null "http://${{ env.DNS_SERVER }}/dashboard/jobs")
 
               if [ "$status_code" = "200" ]; then
                   echo "Health check passed - Status code: 200"
