@@ -20,6 +20,12 @@ The development environment utilizes PostgreSQL locally and runs the Flask serve
    pip install -r requirements.txt
    ```
 
+2. **Run the Application**
+
+   ```shell
+   flask run --port 5005
+   ```
+
 ## Swagger
 
 Access the Swagger documentation at:
