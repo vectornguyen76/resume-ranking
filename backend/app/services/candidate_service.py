@@ -86,15 +86,16 @@ def process_upload_file(file):
 
     # Check type pdf or docx
     if not allowed_file(file.filename):
-        abort(400, message="Invalid file type. Allowed types: pdf, docx!")
+        logger.error("Invalid file type. Allowed types: pdf, docx!")
+        return None
 
     # Compute the SHA-256 hash of the file contents and convert it to hexadecimal
     filehash = hashlib.sha256(file.read()).hexdigest()
 
     # Check hashfile
     if mongo.db.candidate.find_one({"filehash": filehash}):
-        abort(400, message=f"CV candidate is exists! File name: {file.filename}")
-
+        logger.error(f"CV candidate is exists! File name: {file.filename}")
+        return None
     # Move the cursor to the beginning of the file
     file.seek(0)
 
@@ -104,7 +105,8 @@ def process_upload_file(file):
 
     # Check response status and return appropriate response
     if response.status_code != 200:
-        abort(400, message=f"Fail to analyse CV candidate! File name: {file.filename}")
+        logger.error(f"Fail to analyse CV candidate! File name: {file.filename}")
+        return None
 
     # Get the content of the response
     response_content = response.json()
@@ -122,7 +124,7 @@ def process_upload_file(file):
 
     except Exception as e:
         logger.error(f"Upload document to Database failed! Error: {str(e)}")
-        abort(400, message="Upload document to Database failed!")
+        return None
 
     return None
 
